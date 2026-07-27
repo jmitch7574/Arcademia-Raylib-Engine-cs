@@ -1,0 +1,33 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raylib-cs", "Raylib-cs\Raylib-cs.csproj", "{A318AF82-9653-4569-B47D-75EC2446B87E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopApp", "DesktopApp\DesktopApp.csproj", "{AE1A2E02-3CBB-436B-B73C-A7DE9ABC024E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedGame", "SharedGame\SharedGame.csproj", "{4F3AEED5-52D0-456A-A484-CA748A47B761}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csproj", "{33B3F30A-E8B4-44BA-8896-8602FC0D1C56}"
+EndProject
+Global
+    GlobalSection(SolutionConfigurationPlatforms) = preSolution
+        Debug|Any CPU = Debug|Any CPU
+        Release|Any CPU = Release|Any CPU
+    EndGlobalSection
+    GlobalSection(ProjectConfigurationPlatforms) = postSolution
+        {A318AF82-9653-4569-B47D-75EC2446B87E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {A318AF82-9653-4569-B47D-75EC2446B87E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {A318AF82-9653-4569-B47D-75EC2446B87E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {A318AF82-9653-4569-B47D-75EC2446B87E}.Release|Any CPU.Build.0 = Release|Any CPU
+        {AE1A2E02-3CBB-436B-B73C-A7DE9ABC024E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {AE1A2E02-3CBB-436B-B73C-A7DE9ABC024E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {AE1A2E02-3CBB-436B-B73C-A7DE9ABC024E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {AE1A2E02-3CBB-436B-B73C-A7DE9ABC024E}.Release|Any CPU.Build.0 = Release|Any CPU
+        {4F3AEED5-52D0-456A-A484-CA748A47B761}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {4F3AEED5-52D0-456A-A484-CA748A47B761}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {4F3AEED5-52D0-456A-A484-CA748A47B761}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {4F3AEED5-52D0-456A-A484-CA748A47B761}.Release|Any CPU.Build.0 = Release|Any CPU
+        {33B3F30A-E8B4-44BA-8896-8602FC0D1C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {33B3F30A-E8B4-44BA-8896-8602FC0D1C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {33B3F30A-E8B4-44BA-8896-8602FC0D1C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {33B3F30A-E8B4-44BA-8896-8602FC0D1C56}.Release|Any CPU.Build.0 = Release|Any CPU
+    EndGlobalSection
+EndGlobal
