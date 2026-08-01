@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Your Name",
+    "classifications": [
+        "Game",
+        "Raylib",
+        "WebAssembly"
+    ],
+    "name": "Arcademia Game Engine Template",
+    "identity": "ArcademiaEngine.Template",
+    "shortName": "arcademia",
+    "sourceName": "ArcademiaEngine",
+    "preferNameDirectory": true
+}

@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Raylib-cs\Raylib-cs.csproj" />
-    <ProjectReference Include="..\SharedGame\SharedGame.csproj" />
+    <ProjectReference Include="..\ArcademiaEngine.Core\ArcademiaEngine.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,5 +36,5 @@
     <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
     <EmccFlags>-sUSE_GLFW=3 -sVERBOSE=1 -O2 -g3 -sINITIAL_MEMORY=128MB -sMAXIMUM_MEMORY=2048MB -sALLOW_MEMORY_GROWTH=1</EmccFlags>
   </PropertyGroup>
-
+  
 </Project>

@@ -1,0 +1,49 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Game (Desktop)",
+            "type": "shell",
+            "command": "dotnet run --project ArcademiaEngine.Desktop -c ${input:desktopConfigs}",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run Game (Web)",
+            "type": "shell",
+            "command": "dotnet run --project ArcademiaEngine.Web -c ${input:webConfigs}",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "desktopConfigs",
+            "type": "pickString",
+            "description": "Build configuration",
+            "options": [
+                "Debug",
+                "Release",
+                "Arcademia",
+                "ArcademiaDebug"
+            ],
+            "default": "Debug"
+        },
+        {
+            "id": "webConfigs",
+            "type": "pickString",
+            "description": "Build configuration",
+            "options": [
+                "Debug",
+                "Release"
+            ],
+            "default": "Debug"
+        }
+    ]
+}

@@ -1,0 +1,26 @@
+<Project>
+
+  <PropertyGroup>
+    <Configurations>Release;Debug;Arcademia;ArcademiaDebug</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Arcademia'">
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);ARCADEMIA</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'ArcademiaDebug'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE;ARCADEMIA</DefineConstants>
+  </PropertyGroup>
+
+</Project>
