@@ -41,6 +41,7 @@ static class Inspector
         Inspector.Log("INSPECTOR: initialised");
 
         RegisterInspector(new EngineDetails());
+        RegisterInspector(new SceneInspector());
     }
 
     public static void Shutdown()
