@@ -6,6 +6,7 @@ public static class SceneManager
 
     public static void Update()
     {
+        if (Inspector.Initialised && Inspector.ShouldPauseGame) return;
         currentScene.SceneUpdate();
     }
 

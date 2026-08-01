@@ -16,11 +16,20 @@ public static class Launcher
     public static void Init(LauncherConfig config)
     {
         Launcher.config = config;
+
+        if (config.EnableImGui)
+        {
+            Inspector.Init();
+        }
+
         mainViewport = new Viewport(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+
         SceneManager.SetScene(new RaylibLogo());
     }
     public static void Shutdown()
     {
+        if (config.EnableImGui)
+            Inspector.Shutdown();
     }
 
     public static void Tick()
@@ -37,7 +46,10 @@ public static class Launcher
         {
             mainViewport = new Viewport(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
         }
+
+        Inspector.Update();
     }
+
     private static void Draw()
     {
         Raylib.BeginDrawing();
@@ -48,7 +60,19 @@ public static class Launcher
         SceneManager.Draw();
 
         mainViewport.End();
-        mainViewport.Draw();
+
+        if (Inspector.Active)
+            mainViewport.Draw(new Rectangle(0, 0, mainViewport.Width - Inspector.InspectorWidth, mainViewport.Height - Inspector.ConsoleHeight));
+        else
+            mainViewport.Draw();
+
+
+        if (config.EnableImGui)
+        {
+            Raylib.SetMouseScale(1, 1);
+            Inspector.Draw(mainViewport.Width, mainViewport.Height);
+        }
+
         Raylib.EndDrawing();
     }
 }
