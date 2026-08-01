@@ -1,0 +1,81 @@
+{
+  "ButtonActions": {
+    "JoinGame": {
+      "KeyboardKeys": [
+        "One",
+        "Two"
+      ],
+      "ArcademiaButtons": [
+        "P1_START",
+        "P2_START"
+      ],
+      "GamepadButton": "MiddleRight"
+    },
+    "DropOut": {
+      "KeyboardKeys": [
+        "Q",
+        "RightControl"
+      ],
+      "ArcademiaButtons": [
+        "P1_START",
+        "P2_START"
+      ],
+      "GamepadButton": "MiddleLeft"
+    }
+  },
+  "AxisActions": {},
+  "VectorActions": {
+    "Movement": {
+      "AxisX": {
+        "NegativeAction": {
+          "KeyboardKeys": [
+            "A",
+            "Left"
+          ],
+          "ArcademiaButtons": [
+            "P1_JOYSTICK_LEFT",
+            "P2_JOYSTICK_LEFT"
+          ],
+          "GamepadButton": "LeftFaceLeft"
+        },
+        "PositiveAction": {
+          "KeyboardKeys": [
+            "D",
+            "Right"
+          ],
+          "ArcademiaButtons": [
+            "P1_JOYSTICK_RIGHT",
+            "P2_JOYSTICK_RIGHT"
+          ],
+          "GamepadButton": "LeftFaceRight"
+        },
+        "ControllerAxis": "LeftX"
+      },
+      "AxisY": {
+        "NegativeAction": {
+          "KeyboardKeys": [
+            "W",
+            "Up"
+          ],
+          "ArcademiaButtons": [
+            "P1_JOYSTICK_UP",
+            "P2_JOYSTICK_UP"
+          ],
+          "GamepadButton": "LeftFaceUp"
+        },
+        "PositiveAction": {
+          "KeyboardKeys": [
+            "S",
+            "Down"
+          ],
+          "ArcademiaButtons": [
+            "P1_JOYSTICK_DOWN",
+            "P2_JOYSTICK_DOWN"
+          ],
+          "GamepadButton": "LeftFaceDown"
+        },
+        "ControllerAxis": "LeftY"
+      }
+    }
+  }
+}

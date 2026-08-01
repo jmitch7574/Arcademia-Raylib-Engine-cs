@@ -42,6 +42,7 @@ static class Inspector
 
         RegisterInspector(new EngineDetails());
         RegisterInspector(new SceneInspector());
+        RegisterInspector(new InputInspector());
     }
 
     public static void Shutdown()

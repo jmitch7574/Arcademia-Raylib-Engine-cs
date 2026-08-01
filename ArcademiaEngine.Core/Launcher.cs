@@ -25,7 +25,10 @@ public static class Launcher
         mainViewport = new Viewport(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
 
         SceneManager.SetScene(new RaylibLogo());
+        ActionMap.Load();
+        ActionMap.Save();
     }
+
     public static void Shutdown()
     {
         if (config.EnableImGui)
@@ -42,6 +45,8 @@ public static class Launcher
     {
         SceneManager.SwapScene();
         SceneManager.Update();
+        InputManager.Update();
+
         if (Raylib.IsWindowResized())
         {
             mainViewport = new Viewport(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
