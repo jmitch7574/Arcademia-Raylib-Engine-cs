@@ -17,6 +17,7 @@ public static class Launcher
     {
         Launcher.config = config;
         mainViewport = new Viewport(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+        SceneManager.SetScene(new RaylibLogo());
     }
     public static void Shutdown()
     {
@@ -30,6 +31,8 @@ public static class Launcher
 
     private static void Update()
     {
+        SceneManager.SwapScene();
+        SceneManager.Update();
         if (Raylib.IsWindowResized())
         {
             mainViewport = new Viewport(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
@@ -41,7 +44,9 @@ public static class Launcher
 
         mainViewport.Begin();
         Raylib.ClearBackground(Color.RayWhite);
-        Raylib.DrawText("Hello, Raylib", 10, 10, 10, Color.Black);
+
+        SceneManager.Draw();
+
         mainViewport.End();
         mainViewport.Draw();
         Raylib.EndDrawing();
