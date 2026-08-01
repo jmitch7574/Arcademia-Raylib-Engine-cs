@@ -23,5 +23,12 @@
     <DefineConstants>$(DefineConstants);DESKTOP</DefineConstants>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Recursively grabs all files from the solution-level Resources folder -->
+    <Content Include="$(MSBuildThisFileDirectory)..\Resources\**\*.*">
+      <Link>Resources\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

@@ -36,5 +36,10 @@
     <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
     <EmccFlags>-sUSE_GLFW=3 -sVERBOSE=1 -O2 -g3 -sINITIAL_MEMORY=128MB -sMAXIMUM_MEMORY=2048MB -sALLOW_MEMORY_GROWTH=1</EmccFlags>
   </PropertyGroup>
-  
+
+  <PropertyGroup>
+  <!-- Tells Emscripten to bundle the solution's Resources folder into MEMFS at run-time -->
+    <EmccFlags>$(EmccFlags) --preload-file "$(MSBuildThisFileDirectory)..\Resources@Resources"</EmccFlags>
+  </PropertyGroup>
+
 </Project>
