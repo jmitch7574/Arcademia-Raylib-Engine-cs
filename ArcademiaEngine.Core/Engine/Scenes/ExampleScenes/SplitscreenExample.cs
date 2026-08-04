@@ -64,7 +64,7 @@ public class SplitscreenExample : Scene
             {
                 activePlayerCount++;
 
-                players[i].position += input.Input.GetActionVector2("Movement") * 32f * Raylib.GetFrameTime();                  // Move player
+                players[i].position += input.Input.GetActionVector2("Movement") * 64.0f * Raylib.GetFrameTime();                  // Move player
                 players[i].camera.Target = new Vector2((int)players[i].position.X, (int)players[i].position.Y);                 // Move camera
                 players[i].camera.Offset = new Vector2((int)players[i].divide.Width / 2, (int)players[i].divide.Height / 2);    // Center camera
             }
@@ -129,18 +129,30 @@ public class SplitscreenExample : Scene
             Raylib.BeginMode2D(players[i].camera);
 
             // Draw Grid
-            for (int x = 0; x < LEVEL_WIDTH; x++)
+            for (int x = 0; x <= LEVEL_WIDTH; x++)
             {
                 Raylib.DrawLineEx(new Vector2(x * TILE_SIZE, 0),
                            new Vector2(x * TILE_SIZE, LEVEL_HEIGHT * TILE_SIZE), 2, Color.Gray);
             }
-            for (int y = 0; y < LEVEL_WIDTH; y++)
+            for (int y = 0; y <= LEVEL_HEIGHT; y++)
             {
                 Raylib.DrawLineEx(new Vector2(0, y * TILE_SIZE),
                            new Vector2(LEVEL_WIDTH * TILE_SIZE, y * TILE_SIZE), 2, Color.Gray);
             }
 
-            // Draw Player
+            // Draw other players faded
+            for (int j = 0; j < InputManager.MAX_PLAYERS; j++)
+            {
+                // Don't draw anything for inactive players
+                if (!InputManager.Players[j].IsActive)
+                {
+                    continue;
+                }
+
+                Raylib.DrawRectangle((int)players[j].position.X, (int)players[j].position.Y, TILE_SIZE, TILE_SIZE, Raylib.Fade(InputManager.Players[j].GetColour(), 0.5f));
+            }
+
+            // Draw Current Player Solid
             Raylib.DrawRectangle((int)players[i].position.X, (int)players[i].position.Y, TILE_SIZE, TILE_SIZE, InputManager.Players[i].GetColour());
             Raylib.EndMode2D();
 
