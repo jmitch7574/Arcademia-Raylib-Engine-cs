@@ -73,7 +73,7 @@ public class InputManager
                     else if (IsListening)
                     {
                         Players[1].IsActive = true;
-                        Players[1].Input = new(true, 0);
+                        Players[1].Input = new(true, 1);
                     }
                 }
 

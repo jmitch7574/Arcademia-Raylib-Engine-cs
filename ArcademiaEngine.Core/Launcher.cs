@@ -15,6 +15,8 @@ public static class Launcher
 
     public static void Init(LauncherConfig config)
     {
+        Raylib.SetExitKey(KeyboardKey.Null);
+
         Launcher.config = config;
 
         if (config.EnableImGui)

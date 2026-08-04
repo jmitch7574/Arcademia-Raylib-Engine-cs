@@ -17,8 +17,8 @@
         "RightControl"
       ],
       "ArcademiaButtons": [
-        "P1_START",
-        "P2_START"
+        "P1_EXIT",
+        "P2_EXIT"
       ],
       "GamepadButton": "MiddleLeft"
     }
