@@ -7,7 +7,7 @@ using Raylib_cs;
 /// The scene automatically recalculates screen divisions and placements anytime a player joins or leaves.
 
 
-public class SplitscreenExample : Scene
+public class SplitscreenMultiplayerExample : Scene
 {
 
     /// <summary>
@@ -36,7 +36,7 @@ public class SplitscreenExample : Scene
     List<SplitscreenExamplePlayer> players;
     int previousPlayerCount = -1;
 
-    public SplitscreenExample() : base("SplitscreenExample")
+    public SplitscreenMultiplayerExample() : base("SplitscreenMultiplayerExample")
     {
         // Initialise our players
         players = [];
