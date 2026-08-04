@@ -26,6 +26,12 @@ public class InputManager
 
     public static bool IsListening;
 
+    // Input Events
+    public static event Action<int>? PlayerJoined;
+    public static event Action<int>? PlayerDropped;
+    public static event Action<int>? PlayerDisconnected;
+    public static event Action<int>? PlayerReconnected;
+
     public static void Update()
     {
         foreach (PlayerSlot player in Players)
@@ -61,6 +67,7 @@ public class InputManager
                     {
                         Players[0].IsActive = true;
                         Players[0].Input = new(true, 0);
+                        PlayerJoined?.Invoke(0);
                     }
                 }
 
@@ -74,6 +81,7 @@ public class InputManager
                     {
                         Players[1].IsActive = true;
                         Players[1].Input = new(true, 1);
+                        PlayerJoined?.Invoke(1);
                     }
                 }
 
@@ -106,12 +114,14 @@ public class InputManager
                 {
                     int slot = GetNextDisconnectedPlayerSlot();
                     Players[slot].Input = new PlayerInput(true, i, Players[slot].Input.Lifetime);
+                    PlayerReconnected?.Invoke(slot);
                 }
                 else if (IsListening && IsThereAvailablePlayerSlot())
                 {
                     int slot = GetNextInactivePlayerSlot();
                     Players[slot].Input = new PlayerInput(true, i);
                     Players[slot].IsActive = true;
+                    PlayerJoined?.Invoke(slot);
                 }
 
             }
@@ -159,6 +169,7 @@ public class InputManager
                 {
                     int slot = GetNextDisconnectedPlayerSlot();
                     Players[slot].Input = new PlayerInput(false, gamepadIdx, Players[slot].Input.Lifetime);
+                    PlayerReconnected?.Invoke(slot);
                 }
 
                 else if (IsListening && IsThereAvailablePlayerSlot())
@@ -166,6 +177,7 @@ public class InputManager
                     int slot = GetNextInactivePlayerSlot();
                     Players[slot].Input = new PlayerInput(false, gamepadIdx);
                     Players[slot].IsActive = true;
+                    PlayerJoined?.Invoke(slot);
                 }
             }
         }
@@ -180,6 +192,7 @@ public class InputManager
             if (Players[i].IsActive && Players[i].Input.IsConnected && Players[i].Input.IsActionPressed("DropOut"))
             {
                 Players[i].IsActive = false;
+                PlayerDropped?.Invoke(i);
             }
         }
     }
@@ -193,6 +206,7 @@ public class InputManager
                 if (!Raylib.IsGamepadAvailable(Players[i].Input.InputIdx))
                 {
                     Players[i].Input.IsConnected = false;
+                    PlayerDisconnected?.Invoke(i);
                 }
             }
         }
@@ -205,7 +219,10 @@ public class InputManager
             PlayerSlot ps = Players[i];
 
             if (ps.IsActive && !ps.Input.IsConnected && !ps.Input.IsKeyboard)
+            {
                 ps.IsActive = false;
+                PlayerDropped?.Invoke(i);
+            }
         }
     }
 
