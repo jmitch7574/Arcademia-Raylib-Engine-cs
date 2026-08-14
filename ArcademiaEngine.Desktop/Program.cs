@@ -27,7 +27,7 @@ namespace DesktopApp
             Raylib.SetTargetFPS(60);
 
             // Initialize our shared game core
-            Launcher.Init(new LauncherConfig { EnableImGui = useImGui });
+            Launcher.Init(new LauncherConfig { EnableImGui = useImGui, IsWeb = false });
 
             // Native blocking loop: tightly runs execution cycles
             while (!Raylib.WindowShouldClose())

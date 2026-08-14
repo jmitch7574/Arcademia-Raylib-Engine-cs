@@ -1,5 +1,9 @@
+using System.Data.Common;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Transactions;
+using ArcademiaEngine.Core;
 using Raylib_cs;
 
 
@@ -8,6 +12,18 @@ using Raylib_cs;
 /// </summary>
 public static class InputGraphics
 {
+    static Texture2D KeyTex;
+    static NPatchInfo KeyInfo;
+    static Shader KeyShader;
+
+    public struct KeyboardKeyOptions
+    {
+        public int Height;
+        public bool LightUp;
+        public Color TextColor;
+        public Color KeyColor;
+    };
+
     [Flags]
     public enum AxisDirections
     {
@@ -17,36 +33,65 @@ public static class InputGraphics
         RIGHT = 8,
     }
 
-    public static void DrawKeyboardKey(Vector2 topLeftPosition, KeyboardKey key, int height, out int width, bool lightUp = false)
+    public static void Init()
     {
-        string text = GetKeyDisplayName(key);
-        bool multilineText = false;
-        int fontSize = height;
+        KeyTex = Raylib.LoadTexture("Resources/engine/control-icons/key_background.png");
 
-        if (text.Contains(' '))
+        // KeyInfo (16x16 texture)
+        KeyInfo = new NPatchInfo
         {
-            multilineText = true;
-            text = text.Replace(" ", "\n");
-        }
+            Source = new Rectangle(0, 0, 16, 16),
+            Left = 3,
+            Right = 3,
+            Top = 3,
+            Bottom = 5,
+            Layout = NPatchLayout.NinePatch
+        };
 
-        if (multilineText) fontSize /= 2;
+        if (Launcher.config.IsWeb) KeyShader = Raylib.LoadShader(null, "Resources/engine/shaders/KeyShaderWeb.fs");
+        else KeyShader = Raylib.LoadShader(null, "Resources/engine/shaders/KeyShaderDesktop.fs");
+    }
 
-        Vector2 size = Raylib.MeasureTextEx(Raylib.GetFontDefault(), text, fontSize, MathF.Floor(height / 10));
+    public static void DrawKeyboardKey(Vector2 topLeftPosition, KeyboardKey key, out int width, KeyboardKeyOptions options)
+    {
+        if (options.LightUp && Raylib.IsKeyDown(key)) options.KeyColor = Raylib.ColorBrightness(options.KeyColor, 0.25f);
 
-        width = (int)size.X + 5;
-        int boxHeight = (int)size.Y + 5;
+        // Update Shader Info
+        int replaceLoc0 = Raylib.GetShaderLocation(KeyShader, "replaceColor0");
+        int replaceLoc1 = Raylib.GetShaderLocation(KeyShader, "replaceColor1");
+        int replaceLoc2 = Raylib.GetShaderLocation(KeyShader, "replaceColor2");
+        int tolLoc = Raylib.GetShaderLocation(KeyShader, "tolerance");
+
+        Vector4 repColor0 = Raylib.ColorNormalize(Raylib.ColorBrightness(options.KeyColor, -0.5f));
+        Vector4 repColor1 = Raylib.ColorNormalize(Raylib.ColorBrightness(options.KeyColor, -0.2f));
+        Vector4 repColor2 = Raylib.ColorNormalize(options.KeyColor);
+
+        Raylib.SetShaderValue(KeyShader, replaceLoc0, repColor0, ShaderUniformDataType.Vec4);
+        Raylib.SetShaderValue(KeyShader, replaceLoc1, repColor1, ShaderUniformDataType.Vec4);
+        Raylib.SetShaderValue(KeyShader, replaceLoc2, repColor2, ShaderUniformDataType.Vec4);
+        Raylib.SetShaderValue(KeyShader, tolLoc, 0.1f, ShaderUniformDataType.Float);
+
+        string text = GetKeyDisplayName(key);
+        int fontSize = options.Height;
+
+        Vector2 size = Raylib.MeasureTextEx(Raylib.GetFontDefault(), text, fontSize, MathF.Floor(fontSize / 10));
+
+        width = (int)size.X + fontSize;
+        int boxHeight = (int)size.Y + fontSize;
 
         width = Math.Max(width, boxHeight);
 
         int centerX = (int)(topLeftPosition.X + width / 2);
-        int centerY = (int)(topLeftPosition.Y + height / 2);
+        int centerY = (int)(topLeftPosition.Y + fontSize / 2);
 
-        int additionalHeight = boxHeight - height;
+        int additionalHeight = boxHeight - fontSize;
 
-        if (lightUp && Raylib.IsKeyDown(key)) Raylib.DrawRectangle((int)topLeftPosition.X, (int)topLeftPosition.Y - additionalHeight / 2, width, boxHeight, Color.Red);
-        Raylib.DrawRectangleLines((int)topLeftPosition.X, (int)topLeftPosition.Y - additionalHeight / 2, width, boxHeight, Color.White);
 
-        TextUtils.DrawTextAligned(text, fontSize, new Vector2(centerX, centerY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Color.White);
+        Raylib.BeginShaderMode(KeyShader);
+        Raylib.DrawTextureNPatch(KeyTex, KeyInfo, new Rectangle((int)topLeftPosition.X, (int)topLeftPosition.Y - additionalHeight / 2, width, boxHeight), new Vector2(0, 0), 0, Color.White);
+        Raylib.EndShaderMode();
+
+        TextUtils.DrawTextAligned(text, fontSize, new Vector2(centerX, centerY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.TextColor);
     }
 
     public static string GetKeyDisplayName(KeyboardKey key) => key switch
@@ -58,17 +103,21 @@ public static class InputGraphics
         KeyboardKey.Escape => "Esc",
         KeyboardKey.CapsLock => "Caps",
         KeyboardKey.PrintScreen => "PrtScn",
-        KeyboardKey.ScrollLock => "Scroll Lock",
-        KeyboardKey.NumLock => "Num Lock",
+        KeyboardKey.ScrollLock => "ScrLck",
+        KeyboardKey.NumLock => "NumLck",
         KeyboardKey.PageUp => "Page Up",
         KeyboardKey.PageDown => "Page Down",
         KeyboardKey.KeyboardMenu => "Menu",
 
         // Modifiers & Navigation
-        KeyboardKey.LeftShift or KeyboardKey.RightShift => "Shift",
-        KeyboardKey.LeftControl or KeyboardKey.RightControl => "Ctrl",
-        KeyboardKey.LeftAlt or KeyboardKey.RightAlt => "Alt",
-        KeyboardKey.LeftSuper or KeyboardKey.RightSuper => "Win",
+        KeyboardKey.LeftShift => "L Shift",
+        KeyboardKey.RightShift => "R Shift",
+        KeyboardKey.LeftControl => "L Ctrl",
+        KeyboardKey.RightControl => "R Ctrl",
+        KeyboardKey.LeftAlt => "L Alt",
+        KeyboardKey.RightAlt => "R Alt",
+        KeyboardKey.LeftSuper => "L Super",
+        KeyboardKey.RightSuper => "R Super",
         KeyboardKey.Up => "Up Arrow",
         KeyboardKey.Down => "Down Arrow",
         KeyboardKey.Left => "Left Arrow",

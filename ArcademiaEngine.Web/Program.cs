@@ -12,7 +12,7 @@ namespace WebApp
             Raylib.InitWindow(1280, 720, "Raylib Game - Web WASM App");
             Raylib.SetTargetFPS(60);
 
-            Launcher.Init(new LauncherConfig { EnableImGui = false });
+            Launcher.Init(new LauncherConfig { EnableImGui = false, IsWeb = true });
         }
 
         [JSExport]

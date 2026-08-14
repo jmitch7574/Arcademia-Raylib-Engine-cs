@@ -5,17 +5,19 @@ using Raylib_cs;
 public struct LauncherConfig
 {
     public bool EnableImGui;
+    public bool IsWeb;
     public string Title;
 }
 
 public static class Launcher
 {
-    private static LauncherConfig config;
+    public static LauncherConfig config { get; private set; }
     private static Viewport mainViewport;
 
     public static void Init(LauncherConfig config)
     {
         Raylib.SetExitKey(KeyboardKey.Null);
+        InputGraphics.Init();
 
         Launcher.config = config;
 
