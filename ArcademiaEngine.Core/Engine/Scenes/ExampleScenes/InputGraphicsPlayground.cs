@@ -9,6 +9,7 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
 {
     Viewport vp;
 
+    InputGraphics.GlobalOptions globalOptions;
     InputGraphics.KeyboardKeyOptions keyboardOptions;
     InputGraphics.GamepadFaceOptions gamepadFaceOptions;
     InputGraphics.GamepadStickOptions gamepadStickOptions;
@@ -22,65 +23,7 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
         : base("InputGraphicsPlayground")
     {
         vp = new Viewport(640, 360);
-
-        keyboardOptions = new()
-        {
-            Height = 10,
-            Reactive = true,
-            TextColor = Color.White,
-            KeyColor = Color.Blue
-        };
-
-        gamepadFaceOptions = new()
-        {
-            Height = 12,
-            OutlineColor = Color.Blue,
-            InactiveColor = Color.DarkBlue,
-            ActiveColor = Color.White,
-            Reactive = true,
-            PressedColor = Color.Orange,
-        };
-
-        gamepadStickOptions = new()
-        {
-            Height = 12,
-            OutlineColor = Color.Blue,
-            FillColor = Color.DarkBlue,
-            TextColor = Color.White,
-            StickLabel = 'L',
-            HorizontalAxis = GamepadAxis.LeftX,
-            VerticalAxis = GamepadAxis.LeftY,
-            StickPressButton = GamepadButton.LeftThumb,
-            StickPress = false,
-            Reactive = true
-        };
-
-        gamepadShoulderOptions = new()
-        {
-            Height = 15,
-            OutlineColor = Color.Blue,
-            FillColor = Color.DarkBlue,
-            TextColor = Color.White,
-            Reactive = true
-        };
-
-        gamepadTriggerOptions = new()
-        {
-            Height = 15,
-            OutlineColor = Color.Blue,
-            FillColor = Color.DarkBlue,
-            TextColor = Color.White,
-            Reactive = true
-        };
-
-        gamepadMenuOptions = new()
-        {
-            Height = 15,
-            OutlineColor = Color.Blue,
-            FillColor = Color.DarkBlue,
-            IconColor = Color.White,
-            Reactive = true
-        };
+        ResetOptions();
     }
 
     protected override void Update()
@@ -103,6 +46,58 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
 
         vp.End();
         vp.Draw();
+    }
+
+    private void ResetOptions()
+    {
+
+        globalOptions = new InputGraphics.GlobalOptions
+        {
+            Height = 15,
+            Reactive = true,
+            OutlineColor = Color.Blue,
+            FillColor = Color.DarkBlue,
+            IconColor = Color.White,
+            SpecialColor = Color.Orange
+        };
+
+        keyboardOptions = new InputGraphics.KeyboardKeyOptions
+        {
+            Base = globalOptions with { Height = 10 }
+        };
+
+        gamepadFaceOptions = new InputGraphics.GamepadFaceOptions
+        {
+            Base = globalOptions with { Height = 12 }
+        };
+
+        gamepadStickOptions = new InputGraphics.GamepadStickOptions
+        {
+            Base = globalOptions with { Height = 12 },
+            StickLabel = 'L',
+            HorizontalAxis = GamepadAxis.LeftX,
+            VerticalAxis = GamepadAxis.LeftY,
+            StickPressButton = GamepadButton.LeftThumb,
+            StickPress = false
+        };
+
+        gamepadShoulderOptions = new InputGraphics.GamepadShoulderOptions
+        {
+            Base = globalOptions,
+            Button = GamepadButton.LeftTrigger1
+        };
+
+        gamepadTriggerOptions = new InputGraphics.GamepadTriggerOptions
+        {
+            Base = globalOptions,
+            Axis = GamepadAxis.LeftTrigger
+        };
+
+        gamepadMenuOptions = new InputGraphics.GamepadMenuOptions
+        {
+            Base = globalOptions,
+            Button = GamepadButton.MiddleLeft
+        };
     }
 
     public void DrawKeyboardPage()
@@ -192,29 +187,29 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
 
         currentX = 25; currentY += 45;
 
-        gamepadShoulderOptions.Button = InputGraphics.ShoulderButton.BUMPER_LEFT;
+        gamepadShoulderOptions.Button = GamepadButton.LeftTrigger1;
         InputGraphics.DrawShoulderButton(new Vector2(currentX, currentY), gamepadShoulderOptions);
         currentX += 45;
 
-        gamepadShoulderOptions.Button = InputGraphics.ShoulderButton.BUMPER_RIGHT;
+        gamepadShoulderOptions.Button = GamepadButton.RightTrigger1;
         InputGraphics.DrawShoulderButton(new Vector2(currentX, currentY), gamepadShoulderOptions);
         currentX += 45;
 
-        gamepadTriggerOptions.Button = InputGraphics.TriggerButton.TRIGGER_LEFT;
-        gamepadTriggerOptions.Axis = InputGraphics.TriggerAxis.TRIGGER_LEFT;
+        gamepadTriggerOptions.Button = GamepadButton.LeftTrigger2;
+        gamepadTriggerOptions.Axis = GamepadAxis.LeftTrigger;
         InputGraphics.DrawTriggerButton(new Vector2(currentX, currentY), gamepadTriggerOptions);
         currentX += 45;
 
-        gamepadTriggerOptions.Button = InputGraphics.TriggerButton.TRIGGER_RIGHT;
-        gamepadTriggerOptions.Axis = InputGraphics.TriggerAxis.TRIGGER_RIGHT;
+        gamepadTriggerOptions.Button = GamepadButton.RightTrigger2;
+        gamepadTriggerOptions.Axis = GamepadAxis.RightTrigger;
         InputGraphics.DrawTriggerButton(new Vector2(currentX, currentY), gamepadTriggerOptions);
         currentX += 45;
 
-        gamepadMenuOptions.Button = InputGraphics.MenuButton.LEFT;
+        gamepadMenuOptions.Button = GamepadButton.MiddleLeft;
         InputGraphics.DrawMenuButton(new Vector2(currentX, currentY), gamepadMenuOptions);
         currentX += 45;
 
-        gamepadMenuOptions.Button = InputGraphics.MenuButton.RIGHT;
+        gamepadMenuOptions.Button = GamepadButton.MiddleRight;
         InputGraphics.DrawMenuButton(new Vector2(currentX, currentY), gamepadMenuOptions);
         currentX += 45;
     }
@@ -224,29 +219,56 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
         Raylib.DrawText("Arcademia Graphics", 5, 5, 10, Color.White);
     }
 
+    private void DrawColorOptions(ref InputGraphics.GlobalOptions options)
+    {
+        ImGuiEx.RaylibColorEdit("Outline Color", ref options.OutlineColor);
+        ImGuiEx.RaylibColorEdit("Fill Color", ref options.FillColor);
+        ImGuiEx.RaylibColorEdit("Icon Color", ref options.IconColor);
+        ImGuiEx.RaylibColorEdit("Special Color", ref options.SpecialColor);
+    }
+
     public void DrawInspector()
     {
-        ImGui.SeparatorText("Keyboard");
-        ImGuiEx.RaylibColorEdit("Key Colour", ref keyboardOptions.KeyColor);
-        ImGuiEx.RaylibColorEdit("Text Colour", ref keyboardOptions.TextColor);
+        if (ImGui.Button("Reset"))
+            ResetOptions();
 
-        ImGui.SeparatorText("Gamepad Face Buttons");
-        ImGuiEx.RaylibColorEdit("Active Button Color", ref gamepadFaceOptions.ActiveColor);
-        ImGuiEx.RaylibColorEdit("Inactive Button Color", ref gamepadFaceOptions.InactiveColor);
-        ImGuiEx.RaylibColorEdit("Outline Color", ref gamepadFaceOptions.OutlineColor);
+        ImGui.PushID("Keyboard");
+        ImGui.SeparatorText("Keyboard Options");
+        DrawColorOptions(ref keyboardOptions.Base);
+        ImGui.PopID();
 
+        ImGui.PushID("Face");
+        ImGui.SeparatorText("Gamepad Face Options");
+        DrawColorOptions(ref gamepadFaceOptions.Base);
+        ImGui.PopID();
+
+        ImGui.PushID("Stick");
         ImGui.SeparatorText("Gamepad Stick Options");
-        ImGuiEx.RaylibColorEdit("Stick Fill Color", ref gamepadStickOptions.FillColor);
-        ImGuiEx.RaylibColorEdit("Stick Outline Color", ref gamepadStickOptions.OutlineColor);
-        ImGuiEx.RaylibColorEdit("Stick Text Color", ref gamepadStickOptions.TextColor);
-
+        DrawColorOptions(ref gamepadStickOptions.Base);
         string a = gamepadStickOptions.StickLabel.ToString();
-        ImGui.InputText("Stick Text Color", ref a, 1);
+        ImGui.InputText("Stick Text: ", ref a, 1);
 
         if (a.Length > 0)
             gamepadStickOptions.StickLabel = a.ToCharArray()[0];
         else
             gamepadStickOptions.StickLabel = ' ';
+        ImGui.PopID();
+
+
+        ImGui.PushID("Shoulder");
+        ImGui.SeparatorText("Gamepad Shoulder Options");
+        DrawColorOptions(ref gamepadShoulderOptions.Base);
+        ImGui.PopID();
+
+        ImGui.PushID("Trigger");
+        ImGui.SeparatorText("Gamepad Trigger Options");
+        DrawColorOptions(ref gamepadTriggerOptions.Base);
+        ImGui.PopID();
+
+        ImGui.PushID("Menu");
+        ImGui.SeparatorText("Gamepad Menu Options");
+        DrawColorOptions(ref gamepadMenuOptions.Base);
+        ImGui.PopID();
 
         ImGui.Text($"{float.Clamp((InputManager.GetGlobalAxis(GamepadAxis.LeftTrigger) + 1), 0.0f, 1.0f)}");
     }
