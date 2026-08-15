@@ -226,6 +226,22 @@ public class InputManager
         }
     }
 
+    public static bool GetGlobalGamepadButtonDown(GamepadButton button) => Enumerable.Range(0, MAX_CONTROLLER_LISTENING)
+                                                                            .Where(id => Raylib.IsGamepadAvailable(id))
+                                                                            .Any(id => Raylib.IsGamepadButtonDown(id, button));
+
+    public static bool GetGlobalGamepadButtonPressed(GamepadButton button) => Enumerable.Range(0, MAX_CONTROLLER_LISTENING)
+                                                                            .Where(id => Raylib.IsGamepadAvailable(id))
+                                                                            .Any(id => Raylib.IsGamepadButtonPressed(id, button));
+
+    public static bool GetGlobalGamepadButtonReleased(GamepadButton button) => Enumerable.Range(0, MAX_CONTROLLER_LISTENING)
+                                                                            .Where(id => Raylib.IsGamepadAvailable(id))
+                                                                            .Any(id => Raylib.IsGamepadButtonReleased(id, button));
+
+    public static float GetGlobalAxis(GamepadAxis axis) => float.Clamp(Enumerable.Range(0, MAX_CONTROLLER_LISTENING)
+                                                                            .Where(id => Raylib.IsGamepadAvailable(id))
+                                                                            .Sum(id => Raylib.GetGamepadAxisMovement(id, axis)), -1.0f, 1.0f);
+
     private static void BeginListening() => IsListening = true;
 
     private static void EndListening() => IsListening = false;

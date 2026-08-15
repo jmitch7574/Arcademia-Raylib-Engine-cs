@@ -12,6 +12,9 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
     InputGraphics.KeyboardKeyOptions keyboardOptions;
     InputGraphics.GamepadFaceOptions gamepadFaceOptions;
     InputGraphics.GamepadStickOptions gamepadStickOptions;
+    InputGraphics.GamepadShoulderOptions gamepadShoulderOptions;
+    InputGraphics.GamepadTriggerOptions gamepadTriggerOptions;
+    InputGraphics.GamepadMenuOptions gamepadMenuOptions;
 
     int pageOption = 0;
 
@@ -23,26 +26,60 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
         keyboardOptions = new()
         {
             Height = 10,
-            LightUp = true,
+            Reactive = true,
             TextColor = Color.White,
             KeyColor = Color.Blue
         };
 
         gamepadFaceOptions = new()
         {
-            Height = 15,
+            Height = 12,
             OutlineColor = Color.Blue,
             InactiveColor = Color.DarkBlue,
             ActiveColor = Color.White,
+            Reactive = true,
+            PressedColor = Color.Orange,
         };
 
         gamepadStickOptions = new()
+        {
+            Height = 12,
+            OutlineColor = Color.Blue,
+            FillColor = Color.DarkBlue,
+            TextColor = Color.White,
+            StickLabel = 'L',
+            HorizontalAxis = GamepadAxis.LeftX,
+            VerticalAxis = GamepadAxis.LeftY,
+            StickPressButton = GamepadButton.LeftThumb,
+            StickPress = false,
+            Reactive = true
+        };
+
+        gamepadShoulderOptions = new()
         {
             Height = 15,
             OutlineColor = Color.Blue,
             FillColor = Color.DarkBlue,
             TextColor = Color.White,
-            StickLabel = 'R'
+            Reactive = true
+        };
+
+        gamepadTriggerOptions = new()
+        {
+            Height = 15,
+            OutlineColor = Color.Blue,
+            FillColor = Color.DarkBlue,
+            TextColor = Color.White,
+            Reactive = true
+        };
+
+        gamepadMenuOptions = new()
+        {
+            Height = 15,
+            OutlineColor = Color.Blue,
+            FillColor = Color.DarkBlue,
+            IconColor = Color.White,
+            Reactive = true
         };
     }
 
@@ -136,6 +173,7 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
         currentX = 25;
         currentY += 45;
 
+        gamepadStickOptions.StickPress = false;
         foreach (var flag in allCombinations)
         {
             gamepadStickOptions.Directions = flag;
@@ -147,6 +185,38 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
                 currentX = 25; currentY += 45;
             }
         }
+
+        gamepadStickOptions.StickPress = true;
+        InputGraphics.DrawStick(new Vector2(currentX, currentY), gamepadStickOptions);
+
+
+        currentX = 25; currentY += 45;
+
+        gamepadShoulderOptions.Button = InputGraphics.ShoulderButton.BUMPER_LEFT;
+        InputGraphics.DrawShoulderButton(new Vector2(currentX, currentY), gamepadShoulderOptions);
+        currentX += 45;
+
+        gamepadShoulderOptions.Button = InputGraphics.ShoulderButton.BUMPER_RIGHT;
+        InputGraphics.DrawShoulderButton(new Vector2(currentX, currentY), gamepadShoulderOptions);
+        currentX += 45;
+
+        gamepadTriggerOptions.Button = InputGraphics.TriggerButton.TRIGGER_LEFT;
+        gamepadTriggerOptions.Axis = InputGraphics.TriggerAxis.TRIGGER_LEFT;
+        InputGraphics.DrawTriggerButton(new Vector2(currentX, currentY), gamepadTriggerOptions);
+        currentX += 45;
+
+        gamepadTriggerOptions.Button = InputGraphics.TriggerButton.TRIGGER_RIGHT;
+        gamepadTriggerOptions.Axis = InputGraphics.TriggerAxis.TRIGGER_RIGHT;
+        InputGraphics.DrawTriggerButton(new Vector2(currentX, currentY), gamepadTriggerOptions);
+        currentX += 45;
+
+        gamepadMenuOptions.Button = InputGraphics.MenuButton.LEFT;
+        InputGraphics.DrawMenuButton(new Vector2(currentX, currentY), gamepadMenuOptions);
+        currentX += 45;
+
+        gamepadMenuOptions.Button = InputGraphics.MenuButton.RIGHT;
+        InputGraphics.DrawMenuButton(new Vector2(currentX, currentY), gamepadMenuOptions);
+        currentX += 45;
     }
 
     public void DrawArcademiaButtons()
@@ -177,5 +247,7 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
             gamepadStickOptions.StickLabel = a.ToCharArray()[0];
         else
             gamepadStickOptions.StickLabel = ' ';
+
+        ImGui.Text($"{float.Clamp((InputManager.GetGlobalAxis(GamepadAxis.LeftTrigger) + 1), 0.0f, 1.0f)}");
     }
 }

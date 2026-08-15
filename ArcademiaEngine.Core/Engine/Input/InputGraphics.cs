@@ -1,7 +1,9 @@
+using System.ComponentModel;
 using System.Data.Common;
 using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Transactions;
 using ArcademiaEngine.Core;
 using Raylib_cs;
@@ -19,7 +21,7 @@ public static class InputGraphics
     public struct KeyboardKeyOptions
     {
         public int Height;
-        public bool LightUp;
+        public bool Reactive;
         public Color TextColor;
         public Color KeyColor;
     };
@@ -31,6 +33,9 @@ public static class InputGraphics
         public Color InactiveColor;
         public Color ActiveColor;
         public AxisDirections Directions;
+        public bool Reactive;
+        public Color PressedColor;
+        public int? ControllerId;
     };
 
     public struct GamepadStickOptions
@@ -41,7 +46,73 @@ public static class InputGraphics
         public Color TextColor;
         public AxisDirections Directions;
         public char StickLabel;
+        public GamepadAxis? HorizontalAxis;
+        public GamepadAxis? VerticalAxis;
+        public GamepadButton? StickPressButton;
+        public bool StickPress;
+        public bool Reactive;
+        public int? ControllerId;
     };
+
+
+    public enum ShoulderButton
+    {
+        BUMPER_LEFT = GamepadButton.LeftTrigger1,
+        BUMPER_RIGHT = GamepadButton.RightTrigger1
+    }
+
+    public struct GamepadShoulderOptions
+    {
+        public int Height;
+        public Color OutlineColor;
+        public Color FillColor;
+        public Color TextColor;
+        public ShoulderButton Button;
+        public bool Reactive;
+        public int? ControllerId;
+    };
+
+
+    public enum TriggerButton
+    {
+        TRIGGER_LEFT = GamepadButton.LeftTrigger2,
+        TRIGGER_RIGHT = GamepadButton.RightTrigger2
+    }
+
+    public enum TriggerAxis
+    {
+        TRIGGER_LEFT = GamepadAxis.LeftTrigger,
+        TRIGGER_RIGHT = GamepadAxis.RightTrigger
+    }
+
+    public struct GamepadTriggerOptions
+    {
+        public int Height;
+        public Color OutlineColor;
+        public Color FillColor;
+        public Color TextColor;
+        public TriggerButton? Button;
+        public TriggerAxis? Axis;
+        public bool Reactive;
+        public int? ControllerId;
+    };
+
+    public enum MenuButton
+    {
+        LEFT = GamepadButton.MiddleLeft,
+        RIGHT = GamepadButton.MiddleRight,
+    }
+
+    public struct GamepadMenuOptions
+    {
+        public int Height;
+        public Color OutlineColor;
+        public Color FillColor;
+        public Color IconColor;
+        public MenuButton Button;
+        public bool Reactive;
+        public int? ControllerId;
+    }
 
     [Flags]
     public enum AxisDirections
@@ -73,7 +144,7 @@ public static class InputGraphics
 
     public static void DrawKeyboardKey(Vector2 topLeftPosition, KeyboardKey key, out int width, KeyboardKeyOptions options)
     {
-        if (options.LightUp && Raylib.IsKeyDown(key)) options.KeyColor = Raylib.ColorBrightness(options.KeyColor, 0.25f);
+        if (options.Reactive && Raylib.IsKeyDown(key)) options.KeyColor = Raylib.ColorBrightness(options.KeyColor, 0.25f);
 
         // Update Shader Info
         int replaceLoc0 = Raylib.GetShaderLocation(KeyShader, "replaceColor0");
@@ -189,6 +260,18 @@ public static class InputGraphics
         _ => key.ToString()
     };
 
+    private static bool GetButtonDown(GamepadButton button, int? controllerId)
+    {
+        if (controllerId != null) return Raylib.IsGamepadButtonDown((int)controllerId, button);
+        else return InputManager.GetGlobalGamepadButtonDown(button);
+    }
+
+    private static float GetAxis(GamepadAxis axis, int? controllerId)
+    {
+        if (controllerId != null) return Raylib.GetGamepadAxisMovement((int)controllerId, axis);
+        else return InputManager.GetGlobalAxis(axis);
+    }
+
 
     public static void DrawFaceButtons(Vector2 center, GamepadFaceOptions options)
     {
@@ -197,26 +280,22 @@ public static class InputGraphics
         int cX = (int)center.X;
         int cY = (int)center.Y;
 
+        var directions = new (AxisDirections Flag, GamepadButton button, int OffsetX, int OffsetY)[]
+        {
+            (AxisDirections.UP, GamepadButton.RightFaceUp, 0, -2 * radius),
+            (AxisDirections.DOWN, GamepadButton.RightFaceDown, 0,  2 * radius),
+            (AxisDirections.LEFT, GamepadButton.RightFaceLeft, -2 * radius, 0),
+            (AxisDirections.RIGHT, GamepadButton.RightFaceRight, 2 * radius, 0)
+        };
 
-        if (options.Directions.HasFlag(AxisDirections.UP))
-            Raylib.DrawCircle(cX, cY - (2 * radius), radius, options.ActiveColor);
-        else
-            Raylib.DrawCircle(cX, cY - (2 * radius), radius, options.InactiveColor);
+        foreach (var (flag, button, offsetX, offsetY) in directions)
+        {
+            var color = options.Directions.HasFlag(flag) ? options.ActiveColor : options.InactiveColor;
 
-        if (options.Directions.HasFlag(AxisDirections.DOWN))
-            Raylib.DrawCircle(cX, cY + (2 * radius), radius, options.ActiveColor);
-        else
-            Raylib.DrawCircle(cX, cY + (2 * radius), radius, options.InactiveColor);
+            if (options.Reactive && GetButtonDown(button, options.ControllerId)) color = options.PressedColor;
 
-        if (options.Directions.HasFlag(AxisDirections.LEFT))
-            Raylib.DrawCircle(cX - (2 * radius), cY, radius, options.ActiveColor);
-        else
-            Raylib.DrawCircle(cX - (2 * radius), cY, radius, options.InactiveColor);
-
-        if (options.Directions.HasFlag(AxisDirections.RIGHT))
-            Raylib.DrawCircle(cX + (2 * radius), cY, radius, options.ActiveColor);
-        else
-            Raylib.DrawCircle(cX + (2 * radius), cY, radius, options.InactiveColor);
+            Raylib.DrawCircle(cX + offsetX, cY + offsetY, radius, color);
+        }
 
         // Outlines
         Raylib.DrawCircleLines(cX, cY - (2 * radius), radius, options.OutlineColor); // North
@@ -240,17 +319,46 @@ public static class InputGraphics
         Raylib.DrawRectangle(cX - edgeDist, cY - borderDist, edgeDist * 2, borderDist * 2, options.InactiveColor);
         Raylib.DrawRectangle(cX - borderDist, cY - edgeDist, borderDist * 2, edgeDist * 2, options.InactiveColor);
 
-        if (options.Directions.HasFlag(AxisDirections.UP))
-            Raylib.DrawTriangle(new Vector2(cX - borderDist, cY - halfDist), new Vector2(cX + borderDist, cY - halfDist), new Vector2(cX, cY - edgeDist), options.ActiveColor);
+        var triangles = new (AxisDirections Flag, GamepadButton button, Vector2 V1, Vector2 V2, Vector2 V3)[]
+        {
+            (
+                AxisDirections.UP,
+                GamepadButton.LeftFaceUp,
+                new Vector2(cX - borderDist, cY - halfDist),
+                new Vector2(cX + borderDist, cY - halfDist),
+                new Vector2(cX, cY - edgeDist)
+            ),
+            (
+                AxisDirections.DOWN,
+                GamepadButton.LeftFaceDown,
+                new Vector2(cX, cY + edgeDist),
+                new Vector2(cX + borderDist, cY + halfDist),
+                new Vector2(cX - borderDist, cY + halfDist)
+            ),
+            (
+                AxisDirections.LEFT,
+                GamepadButton.LeftFaceLeft,
+                new Vector2(cX - edgeDist, cY),
+                new Vector2(cX - halfDist, cY + borderDist),
+                new Vector2(cX - halfDist, cY - borderDist)
+            ),
+            (
+                AxisDirections.RIGHT,
+                GamepadButton.LeftFaceRight,
+                new Vector2(cX + halfDist, cY - borderDist),
+                new Vector2(cX + halfDist, cY + borderDist),
+                new Vector2(cX + edgeDist, cY)
+            )
+        };
 
-        if (options.Directions.HasFlag(AxisDirections.DOWN))
-            Raylib.DrawTriangle(new Vector2(cX, cY + edgeDist), new Vector2(cX + borderDist, cY + halfDist), new Vector2(cX - borderDist, cY + halfDist), options.ActiveColor);
+        foreach (var (flag, button, v1, v2, v3) in triangles)
+        {
+            if (options.Directions.HasFlag(flag))
+                Raylib.DrawTriangle(v1, v2, v3, options.ActiveColor);
 
-        if (options.Directions.HasFlag(AxisDirections.LEFT))
-            Raylib.DrawTriangle(new Vector2(cX - edgeDist, cY), new Vector2(cX - halfDist, cY + borderDist), new Vector2(cX - halfDist, cY - borderDist), options.ActiveColor);
-
-        if (options.Directions.HasFlag(AxisDirections.RIGHT))
-            Raylib.DrawTriangle(new Vector2(cX + halfDist, cY - borderDist), new Vector2(cX + halfDist, cY + borderDist), new Vector2(cX + edgeDist, cY), options.ActiveColor);
+            if (options.Reactive && GetButtonDown(button, options.ControllerId))
+                Raylib.DrawTriangle(v1, v2, v3, options.PressedColor);
+        }
 
 
         // Outlines
@@ -283,6 +391,22 @@ public static class InputGraphics
         int cX = (int)center.X;
         int cY = (int)center.Y;
 
+        int mX = 0;
+        int mY = 0;
+
+        if (!options.StickPress)
+        {
+            if (options.HorizontalAxis != null)
+            {
+                mX = (int)(GetAxis((GamepadAxis)options.HorizontalAxis, options.ControllerId) * options.Height / 2);
+            }
+
+            if (options.VerticalAxis != null)
+            {
+                mY = (int)(GetAxis((GamepadAxis)options.VerticalAxis, options.ControllerId) * options.Height / 2);
+            }
+        }
+
         int stickOutlineEnd = (int)(options.Height / 1.25f); // Distance from center to inner edge
         int stickOutlineStart = (int)(options.Height / 1.5f); // Distance from center to inner edge
 
@@ -292,26 +416,144 @@ public static class InputGraphics
 
         int textHeight = ((int)(options.Height / 10) * 10);
 
+        if (!options.StickPress)
+        {
+            if (options.Directions.HasFlag(AxisDirections.UP))
+                Raylib.DrawTriangle(new Vector2(cX - triangleHalfWidth, cY - triangleStart), new Vector2(cX + triangleHalfWidth, cY - triangleStart), new Vector2(cX, cY - edgeDist), options.TextColor);
+
+            if (options.Directions.HasFlag(AxisDirections.DOWN))
+                Raylib.DrawTriangle(new Vector2(cX, cY + edgeDist), new Vector2(cX + triangleHalfWidth, cY + triangleStart), new Vector2(cX - triangleHalfWidth, cY + triangleStart), options.TextColor);
+
+            if (options.Directions.HasFlag(AxisDirections.LEFT))
+                Raylib.DrawTriangle(new Vector2(cX - edgeDist, cY), new Vector2(cX - triangleStart, cY + triangleHalfWidth), new Vector2(cX - triangleStart, cY - triangleHalfWidth), options.TextColor);
+
+            if (options.Directions.HasFlag(AxisDirections.RIGHT))
+                Raylib.DrawTriangle(new Vector2(cX + triangleStart, cY - triangleHalfWidth), new Vector2(cX + triangleStart, cY + triangleHalfWidth), new Vector2(cX + edgeDist, cY), options.TextColor);
+        }
+
         // Stick BG
-        Raylib.DrawCircle(cX, cY, stickOutlineEnd, options.FillColor);
+        if (options.Reactive && GetButtonDown((GamepadButton)options.StickPressButton, options.ControllerId))
+            Raylib.DrawCircle(cX + mX, cY + mY, stickOutlineStart, Raylib.ColorBrightness(options.FillColor, 0.25f));
+        else
+            Raylib.DrawCircle(cX + mX, cY + mY, stickOutlineStart, options.FillColor);
 
         // Stick Outline
-        Raylib.DrawRing(new Vector2(cX, cY), stickOutlineStart, stickOutlineEnd, 0, 360, 8, options.OutlineColor);
+        Raylib.DrawRing(new Vector2(cX + mX, cY + mY), stickOutlineStart, stickOutlineEnd, 0, 360, 8, options.OutlineColor);
 
-        // Stick Lbale
-        TextUtils.DrawTextAligned($"{options.StickLabel}", textHeight, new Vector2(cX, cY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.TextColor);
+        // Stick Label
+        TextUtils.DrawTextAligned($"{options.StickLabel}", textHeight, new Vector2(cX + mX, cY + mY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.TextColor);
 
-        if (options.Directions.HasFlag(AxisDirections.UP))
-            Raylib.DrawTriangle(new Vector2(cX - triangleHalfWidth, cY - triangleStart), new Vector2(cX + triangleHalfWidth, cY - triangleStart), new Vector2(cX, cY - edgeDist), options.TextColor);
+        if (options.StickPress)
+        {
+            Raylib.DrawTriangle(new Vector2(cX, cY - options.Height / 3), new Vector2(cX + stickOutlineEnd / 2, cY - stickOutlineEnd), new Vector2(cX - stickOutlineEnd / 2, cY - stickOutlineEnd), options.TextColor);
+        }
 
-        if (options.Directions.HasFlag(AxisDirections.DOWN))
-            Raylib.DrawTriangle(new Vector2(cX, cY + edgeDist), new Vector2(cX + triangleHalfWidth, cY + triangleStart), new Vector2(cX - triangleHalfWidth, cY + triangleStart), options.TextColor);
-
-        if (options.Directions.HasFlag(AxisDirections.LEFT))
-            Raylib.DrawTriangle(new Vector2(cX - edgeDist, cY), new Vector2(cX - triangleStart, cY + triangleHalfWidth), new Vector2(cX - triangleStart, cY - triangleHalfWidth), options.TextColor);
-
-        if (options.Directions.HasFlag(AxisDirections.RIGHT))
-            Raylib.DrawTriangle(new Vector2(cX + triangleStart, cY - triangleHalfWidth), new Vector2(cX + triangleStart, cY + triangleHalfWidth), new Vector2(cX + edgeDist, cY), options.TextColor);
     }
 
+    public static void DrawShoulderButton(Vector2 center, GamepadShoulderOptions options)
+    {
+        int cX = (int)center.X;
+        int cY = (int)center.Y;
+
+        int textHeight = ((int)(options.Height / 10) * 10);
+
+        int height = (int)(options.Height);
+        int width = (int)(height * 2f);
+
+        int topLeftX = cX - width / 2;
+        int topLeftY = cY - height / 2;
+
+        string shoulderButtonText = options.Button switch
+        {
+            ShoulderButton.BUMPER_LEFT => "L1",
+            ShoulderButton.BUMPER_RIGHT => "R1",
+            _ => "??",
+        };
+
+        if (options.Reactive && GetButtonDown((GamepadButton)options.Button, options.ControllerId))
+            Raylib.DrawRectangle(topLeftX, topLeftY, width, height, Raylib.ColorBrightness(options.FillColor, 0.25f));
+        else
+            Raylib.DrawRectangle(topLeftX, topLeftY, width, height, options.FillColor);
+
+        Raylib.DrawRectangleLines(topLeftX, topLeftY, width, height, options.OutlineColor);
+
+        TextUtils.DrawTextAligned(shoulderButtonText, textHeight, new Vector2(cX, cY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.TextColor);
+    }
+
+
+    public static void DrawTriggerButton(Vector2 center, GamepadTriggerOptions options)
+    {
+        int cX = (int)center.X;
+        int cY = (int)center.Y;
+
+        int textHeight = ((int)(options.Height / 10) * 10);
+
+        string triggerText = "??";
+
+        if (options.Button == TriggerButton.TRIGGER_LEFT || options.Axis == TriggerAxis.TRIGGER_LEFT) triggerText = "L2";
+        if (options.Button == TriggerButton.TRIGGER_RIGHT || options.Axis == TriggerAxis.TRIGGER_RIGHT) triggerText = "R2";
+
+        int height = (int)(textHeight * 2.5f);
+        int width = (int)(Raylib.MeasureText(triggerText, textHeight) * 1.5f);
+
+        int topLeftX = cX - width / 2;
+        int topLeftY = cY - height / 2;
+
+        Raylib.DrawRectangle(topLeftX, topLeftY, width, height, options.FillColor);
+
+        if (options.Reactive)
+        {
+            if (options.Axis != null)
+            {
+                int newHeight = (int)(height * float.Clamp(GetAxis((GamepadAxis)options.Axis, options.ControllerId) + 1, 0.0f, 1.0f));
+                Raylib.DrawRectangle(topLeftX, topLeftY, width, newHeight, Raylib.ColorBrightness(options.FillColor, 0.2f));
+            }
+            if (GetButtonDown((GamepadButton)options.Button, options.ControllerId))
+            {
+                Raylib.DrawRectangle(topLeftX, topLeftY, width, height, Raylib.ColorBrightness(options.FillColor, 0.4f));
+            }
+        }
+
+        Raylib.DrawRectangleLines(topLeftX, topLeftY, width, height, options.OutlineColor);
+
+        TextUtils.DrawTextAligned(triggerText, textHeight, new Vector2(cX, cY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.TextColor);
+    }
+
+
+    public static void DrawMenuButton(Vector2 center, GamepadMenuOptions options)
+    {
+        int cX = (int)center.X;
+        int cY = (int)center.Y;
+
+        int radiusY = options.Height / 2;
+        int radiusX = (int)(radiusY * 1.5f);
+        int triangleWidth = (int)(radiusX / 2);
+
+        (Vector2 V1, Vector2 V2, Vector2 V3) triangles = options.Button switch
+        {
+            MenuButton.LEFT => (
+                new Vector2(cX + triangleWidth, cY - radiusY / 2),
+                new Vector2(cX - triangleWidth, cY),
+                new Vector2(cX + triangleWidth, cY + radiusY / 2)
+            ),
+            MenuButton.RIGHT => (
+                new Vector2(cX - triangleWidth, cY + radiusY / 2),
+                new Vector2(cX + triangleWidth, cY),
+                new Vector2(cX - triangleWidth, cY - radiusY / 2)
+            ),
+            _ => throw new NotImplementedException(),
+        };
+
+
+        if (options.Reactive && GetButtonDown((GamepadButton)options.Button, options.ControllerId))
+            Raylib.DrawEllipse(cX, cY, radiusX, radiusY, Raylib.ColorBrightness(options.FillColor, 0.25f));
+        else
+            Raylib.DrawEllipse(cX, cY, radiusX, radiusY, options.FillColor);
+
+        Raylib.DrawTriangle(triangles.V1, triangles.V2, triangles.V3, options.IconColor);
+
+        Raylib.DrawEllipseLines(cX, cY, radiusX, radiusY, options.OutlineColor);
+
+
+    }
 }
