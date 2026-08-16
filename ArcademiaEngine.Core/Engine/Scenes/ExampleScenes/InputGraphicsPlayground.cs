@@ -17,6 +17,9 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
     InputGraphics.GamepadTriggerOptions gamepadTriggerOptions;
     InputGraphics.GamepadMenuOptions gamepadMenuOptions;
 
+    InputGraphics.ArcademiaStickOptions arcademiaStickOptions;
+    InputGraphics.ArcademiaButtonOptions arcademiaButtonOptions;
+
     int pageOption = 0;
 
     public InputGraphicsPlayground()
@@ -97,6 +100,16 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
         {
             Base = globalOptions,
             Button = GamepadButton.MiddleLeft
+        };
+
+        arcademiaStickOptions = new InputGraphics.ArcademiaStickOptions
+        {
+            Base = globalOptions with { Height = 12 },
+        };
+
+        arcademiaButtonOptions = new InputGraphics.ArcademiaButtonOptions
+        {
+            Base = globalOptions
         };
     }
 
@@ -183,8 +196,6 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
 
         gamepadStickOptions.StickPress = true;
         InputGraphics.DrawStick(new Vector2(currentX, currentY), gamepadStickOptions);
-
-
         currentX = 25; currentY += 45;
 
         gamepadShoulderOptions.Button = GamepadButton.LeftTrigger1;
@@ -217,6 +228,55 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
     public void DrawArcademiaButtons()
     {
         Raylib.DrawText("Arcademia Graphics", 5, 5, 10, Color.White);
+
+        int currentX = 25;
+        int currentY = 40;
+
+        int maxBitmask = Enum.GetValues(typeof(InputGraphics.AxisDirections))
+                             .Cast<int>()
+                             .Aggregate(0, (acc, val) => acc | val);
+
+        InputGraphics.AxisDirections[] allCombinations = Enumerable.Range(0, maxBitmask + 1)
+                                                     .Select(i => (InputGraphics.AxisDirections)i)
+                                                     .ToArray();
+
+        foreach (var flag in allCombinations)
+        {
+            arcademiaStickOptions.Directions = flag;
+            InputGraphics.DrawArcademiaStick(new Vector2(currentX, currentY), arcademiaStickOptions);
+
+            currentX += 45;
+            if (currentX > 550)
+            {
+                currentX = 25; currentY += 45;
+            }
+        }
+
+        currentX = 25;
+        currentY += 45;
+
+        List<ArcademiaKeybind> keybinds = new List<ArcademiaKeybind>() {
+            ArcademiaKeybind.P1_START,
+            ArcademiaKeybind.P1_EXIT,
+            ArcademiaKeybind.P1_A,
+            ArcademiaKeybind.P1_B,
+            ArcademiaKeybind.P1_C,
+            ArcademiaKeybind.P1_D,
+            ArcademiaKeybind.P1_E,
+            ArcademiaKeybind.P1_F,
+        };
+
+        foreach (var keybind in keybinds)
+        {
+            arcademiaButtonOptions.Button = keybind;
+            InputGraphics.DrawArcademiaButton(new Vector2(currentX, currentY), arcademiaButtonOptions);
+
+            currentX += 45;
+            if (currentX > 550)
+            {
+                currentX = 25; currentY += 45;
+            }
+        }
     }
 
     private void DrawColorOptions(ref InputGraphics.GlobalOptions options)

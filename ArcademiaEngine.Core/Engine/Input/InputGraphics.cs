@@ -70,6 +70,18 @@ public static class InputGraphics
         public GamepadButton Button;
     }
 
+    public struct ArcademiaStickOptions
+    {
+        public GlobalOptions Base;
+        public AxisDirections Directions;
+    }
+
+    public struct ArcademiaButtonOptions
+    {
+        public GlobalOptions Base;
+        public ArcademiaKeybind Button;
+    }
+
     [Flags]
     public enum AxisDirections
     {
@@ -509,7 +521,100 @@ public static class InputGraphics
         Raylib.DrawTriangle(triangles.V1, triangles.V2, triangles.V3, options.Base.IconColor);
 
         Raylib.DrawEllipseLines(cX, cY, radiusX, radiusY, options.Base.OutlineColor);
+    }
 
+    public static void DrawArcademiaStick(Vector2 center, ArcademiaStickOptions options)
+    {
+        int joystickCX = (int)(center.X);
+        int joystickCY = (int)(center.Y - options.Base.Height / 2);
+        int joystickR = (int)(options.Base.Height / 2);
 
+        int baseCX = (int)(center.X);
+        int baseCY = (int)(center.Y + options.Base.Height / 2);
+        int baseXR = (int)(options.Base.Height / 2);
+        int baseYR = (int)(options.Base.Height / 4);
+
+        float triangleStart = joystickR + 2f;
+        float triangleHalfWidth = joystickR / 2f;
+        float edgeDist = triangleStart + joystickR;
+
+        Raylib.DrawEllipse(baseCX, baseCY, baseXR, baseYR, options.Base.FillColor);
+        Raylib.DrawEllipseLines(baseCX, baseCY, baseXR, baseYR, options.Base.OutlineColor);
+        Raylib.DrawLineEx(new Vector2(baseCX, baseCY), new Vector2(joystickCX, joystickCY), 2.0f, options.Base.OutlineColor);
+
+        Raylib.DrawCircle(joystickCX, joystickCY, joystickR, options.Base.FillColor);
+        Raylib.DrawCircleLines(joystickCX, joystickCY, joystickR, options.Base.OutlineColor);
+
+        if (options.Directions.HasFlag(AxisDirections.UP))
+        {
+            Raylib.DrawTriangle(
+                new Vector2(joystickCX, joystickCY - edgeDist),
+                new Vector2(joystickCX - triangleHalfWidth, joystickCY - triangleStart),
+                new Vector2(joystickCX + triangleHalfWidth, joystickCY - triangleStart),
+                options.Base.IconColor
+            );
+        }
+
+        if (options.Directions.HasFlag(AxisDirections.DOWN))
+        {
+            Raylib.DrawTriangle(
+                new Vector2(joystickCX - triangleHalfWidth, joystickCY + triangleStart),
+                new Vector2(joystickCX, joystickCY + edgeDist),
+                new Vector2(joystickCX + triangleHalfWidth, joystickCY + triangleStart),
+                options.Base.IconColor
+            );
+        }
+
+        if (options.Directions.HasFlag(AxisDirections.LEFT))
+        {
+            Raylib.DrawTriangle(
+                new Vector2(joystickCX - edgeDist, joystickCY),
+                new Vector2(joystickCX - triangleStart, joystickCY + triangleHalfWidth),
+                new Vector2(joystickCX - triangleStart, joystickCY - triangleHalfWidth),
+                options.Base.IconColor
+            );
+        }
+
+        if (options.Directions.HasFlag(AxisDirections.RIGHT))
+        {
+            Raylib.DrawTriangle(
+                new Vector2(joystickCX + edgeDist, joystickCY),
+                new Vector2(joystickCX + triangleStart, joystickCY - triangleHalfWidth),
+                new Vector2(joystickCX + triangleStart, joystickCY + triangleHalfWidth),
+                options.Base.IconColor
+            );
+        }
+    }
+
+    public static void DrawArcademiaButton(Vector2 center, ArcademiaButtonOptions options)
+    {
+        int cX = (int)center.X;
+        int cY = (int)center.Y;
+
+        int offset = options.Base.Height / 4;
+
+        int textHeight = ((int)(options.Base.Height / 10) * 10);
+
+        Raylib.DrawCircle(cX, cY + offset / 2, options.Base.Height / 2, Raylib.ColorBrightness(options.Base.FillColor, -0.25f));
+        Raylib.DrawCircleLines(cX, cY + offset / 2, options.Base.Height / 2, Raylib.ColorBrightness(options.Base.OutlineColor, -0.25f));
+
+        Raylib.DrawCircle(cX, cY - offset / 2, options.Base.Height / 2, options.Base.FillColor);
+        Raylib.DrawCircleLines(cX, cY - offset / 2, options.Base.Height / 2, options.Base.OutlineColor);
+
+        (bool isCenter, string message) stringInfo = options.Button switch
+        {
+            ArcademiaKeybind.P1_START or ArcademiaKeybind.P2_START => (false, "START"),
+            ArcademiaKeybind.P1_EXIT or ArcademiaKeybind.P2_EXIT => (false, "EXIT"),
+            ArcademiaKeybind.P1_A or ArcademiaKeybind.P2_A => (true, "A"),
+            ArcademiaKeybind.P1_B or ArcademiaKeybind.P2_B => (true, "B"),
+            ArcademiaKeybind.P1_C or ArcademiaKeybind.P2_C => (true, "C"),
+            ArcademiaKeybind.P1_D or ArcademiaKeybind.P2_D => (true, "D"),
+            ArcademiaKeybind.P1_E or ArcademiaKeybind.P2_E => (true, "E"),
+            ArcademiaKeybind.P1_F or ArcademiaKeybind.P2_F => (true, "F"),
+            _ => (true, "?")
+        };
+
+        if (stringInfo.isCenter) TextUtils.DrawTextAligned(stringInfo.message, textHeight, new Vector2(cX, cY - offset / 2), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
+        else TextUtils.DrawTextAligned(stringInfo.message, textHeight, new Vector2(cX, cY + options.Base.Height), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
     }
 }
