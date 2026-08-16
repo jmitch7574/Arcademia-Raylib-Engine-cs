@@ -51,8 +51,6 @@ public static class InputGraphics
         public bool StickPress;
     };
 
-
-
     public struct GamepadShoulderOptions
     {
         public GlobalOptions Base;
@@ -65,7 +63,6 @@ public static class InputGraphics
         public GamepadButton? Button;
         public GamepadAxis? Axis;
     };
-
 
     public struct GamepadMenuOptions
     {
@@ -453,7 +450,7 @@ public static class InputGraphics
         if (options.Button == GamepadButton.RightTrigger2 || options.Axis == GamepadAxis.RightTrigger) triggerText = "R2";
 
         int height = (int)(textHeight * 2.5f);
-        int width = (int)(Raylib.MeasureText(triggerText, textHeight) * 1.5f);
+        int width = (int)(textHeight * 1.5f);
 
         int topLeftX = cX - width / 2;
         int topLeftY = cY - height / 2;
@@ -485,7 +482,7 @@ public static class InputGraphics
         int cY = (int)center.Y;
 
         int radiusY = options.Base.Height / 2;
-        int radiusX = (int)(radiusY * 1.5f);
+        int radiusX = (int)(radiusY * 1.25f);
         int triangleWidth = (int)(radiusX / 2);
 
         (Vector2 V1, Vector2 V2, Vector2 V3) triangles = options.Button switch
