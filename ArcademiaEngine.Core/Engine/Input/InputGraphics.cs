@@ -110,7 +110,23 @@ public static class InputGraphics
         else KeyShader = Raylib.LoadShader(null, "Resources/engine/shaders/KeyShaderDesktop.fs");
     }
 
-    public static void DrawKeyboardKey(Vector2 topLeftPosition, KeyboardKey key, out int width, KeyboardKeyOptions options)
+    public static int CalculateKeyWidth(KeyboardKey key, KeyboardKeyOptions options)
+    {
+        string text = GetKeyDisplayName(key);
+        int fontSize = options.Base.Height;
+
+        Vector2 size = Raylib.MeasureTextEx(Raylib.GetFontDefault(), text, fontSize, MathF.Floor(fontSize / 10));
+
+
+        int width = (int)size.X + fontSize;
+        int boxHeight = (int)size.Y + fontSize;
+
+        width = Math.Max(width, boxHeight);
+
+        return width;
+    }
+
+    public static void DrawKeyboardKey(Vector2 center, KeyboardKey key, out int width, KeyboardKeyOptions options)
     {
         if (options.Base.Reactive && Raylib.IsKeyDown(key)) options.Base.OutlineColor = Raylib.ColorBrightness(options.Base.OutlineColor, 0.25f);
 
@@ -120,9 +136,9 @@ public static class InputGraphics
         int replaceLoc2 = Raylib.GetShaderLocation(KeyShader, "replaceColor2");
         int tolLoc = Raylib.GetShaderLocation(KeyShader, "tolerance");
 
-        Vector4 repColor0 = Raylib.ColorNormalize(Raylib.ColorBrightness(options.Base.OutlineColor, -0.5f));
-        Vector4 repColor1 = Raylib.ColorNormalize(Raylib.ColorBrightness(options.Base.OutlineColor, -0.2f));
-        Vector4 repColor2 = Raylib.ColorNormalize(options.Base.OutlineColor);
+        Vector4 repColor0 = Raylib.ColorNormalize(Raylib.ColorBrightness(options.Base.FillColor, -0.5f));
+        Vector4 repColor1 = Raylib.ColorNormalize(Raylib.ColorBrightness(options.Base.FillColor, -0.2f));
+        Vector4 repColor2 = Raylib.ColorNormalize(options.Base.FillColor);
 
         Raylib.SetShaderValue(KeyShader, replaceLoc0, repColor0, ShaderUniformDataType.Vec4);
         Raylib.SetShaderValue(KeyShader, replaceLoc1, repColor1, ShaderUniformDataType.Vec4);
@@ -139,17 +155,17 @@ public static class InputGraphics
 
         width = Math.Max(width, boxHeight);
 
-        int centerX = (int)(topLeftPosition.X + width / 2);
-        int centerY = (int)(topLeftPosition.Y + fontSize / 2);
+        int topLeftX = (int)(center.X - width / 2);
+        int topLeftY = (int)(center.Y - fontSize / 2);
 
         int additionalHeight = boxHeight - fontSize;
 
 
         Raylib.BeginShaderMode(KeyShader);
-        Raylib.DrawTextureNPatch(KeyTex, KeyInfo, new Rectangle((int)topLeftPosition.X, (int)topLeftPosition.Y - additionalHeight / 2, width, boxHeight), new Vector2(0, 0), 0, Color.White);
+        Raylib.DrawTextureNPatch(KeyTex, KeyInfo, new Rectangle(topLeftX, topLeftY - additionalHeight / 2, width, boxHeight), new Vector2(0, 0), 0, Color.White);
         Raylib.EndShaderMode();
 
-        TextUtils.DrawTextAligned(text, fontSize, new Vector2(centerX, centerY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
+        TextUtils.DrawTextAligned(text, fontSize, new Vector2(center.X, center.Y), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
     }
 
     public static string GetKeyDisplayName(KeyboardKey key) => key switch

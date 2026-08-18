@@ -124,9 +124,10 @@ public class InputGraphicsPlayground : Scene, ISceneInspector
 
         foreach (KeyboardKey key in values)
         {
+            currentX += InputGraphics.CalculateKeyWidth(key, keyboardOptions) / 2;
             InputGraphics.DrawKeyboardKey(new Vector2(currentX, currentY), key, out int usedWidth, keyboardOptions);
 
-            currentX += usedWidth + 5;
+            currentX += usedWidth / 2;
             if (currentX > 550)
             {
                 currentX = 15; currentY += 30;
