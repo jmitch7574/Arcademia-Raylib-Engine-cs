@@ -91,6 +91,15 @@ public static class InputGraphics
         RIGHT = 8,
     }
 
+    public static AxisDirections GamepadToAxisDirections(GamepadButton btn) => btn switch
+    {
+        GamepadButton.LeftFaceUp or GamepadButton.RightFaceUp => AxisDirections.UP,
+        GamepadButton.LeftFaceDown or GamepadButton.RightFaceDown => AxisDirections.DOWN,
+        GamepadButton.LeftFaceLeft or GamepadButton.RightFaceLeft => AxisDirections.LEFT,
+        GamepadButton.LeftFaceRight or GamepadButton.RightFaceRight => AxisDirections.RIGHT,
+        _ => throw new NotImplementedException()
+    };
+
     public static void Init()
     {
         KeyTex = Raylib.LoadTexture("Resources/engine/control-icons/key_background.png");

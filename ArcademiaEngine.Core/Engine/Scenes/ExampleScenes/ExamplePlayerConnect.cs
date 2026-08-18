@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Xml;
 using ArcademiaEngine.Core.Utils;
 using Raylib_cs;
 
@@ -88,6 +89,12 @@ public class ExamplePlayerConnect : Scene
 
         // Bottom Text
 
+        InputGraphics.KeyboardKeyOptions keyFormat = new InputGraphics.KeyboardKeyOptions
+        {
+            Base = globalOptions with { Height = 10 },
+        };
+
+
         if (InputManager.GetPlayerCount() < Config.MinPlayers)
         {
             TextUtils.DrawTextAligned($"Minimum {Config.MinPlayers} Required", 30, new Vector2(320, 330),
@@ -103,14 +110,9 @@ public class ExamplePlayerConnect : Scene
                 TextUtils.GuiTextAlignmentVertical.Middle,
                 TextColor);
 #else
-            InputGraphics.KeyboardKeyOptions key = new InputGraphics.KeyboardKeyOptions
-            {
-                Base = globalOptions with { Height = 10 },
-            };
+            int keyWidth = InputGraphics.CalculateKeyWidth(KeyboardKey.Enter, keyFormat);
 
-            int keyWidth = InputGraphics.CalculateKeyWidth(KeyboardKey.Enter, key);
-
-            InputGraphics.DrawKeyboardKey(new Vector2(320 - keyWidth, 305), KeyboardKey.Enter, out int width, key);
+            InputGraphics.DrawKeyboardKey(new Vector2(320 - keyWidth, 305), KeyboardKey.Enter, out int width, keyFormat);
 
             InputGraphics.DrawMenuButton(new Vector2(320 + 30, 305), new InputGraphics.GamepadMenuOptions
             {
@@ -171,9 +173,46 @@ public class ExamplePlayerConnect : Scene
 
             Raylib.DrawRectangleRec(new Rectangle(x, y, width, height), Background);
 
-            TextUtils.DrawTextAligned($"{i + 1}", 40, new Vector2(centerX, centerY - 20),
+            TextUtils.DrawTextAligned($"{i + 1}", 30, new Vector2(centerX, centerY - 30),
                             TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle,
                             Outline);
+
+#if ARCADEMIA
+            InputGraphics.DrawArcademiaButton(new Vector2(centerX - 25, centerY + 10), new InputGraphics.ArcademiaButtonOptions
+            {
+                Base = globalOptions with { Height = 15 },
+                Button = ArcademiaKeybind.P1_A
+            });
+            TextUtils.DrawTextAligned("Join", 20, new Vector2(centerX - 10, centerY + 10), TextUtils.GuiTextAlignment.Left, TextUtils.GuiTextAlignmentVertical.Middle, Outline);
+#else
+            ButtonAction JoinGame = ActionMap.GetButtonAction("JoinGame");
+
+            int nextEmptyKbSlot = Enumerable.Range(0, InputManager.MAX_KEYBOARD_PLAYERS)
+                .FirstOrDefault(kb => InputManager.Players.All(p =>
+                    !p.IsActive || !p.Input.IsKeyboard || p.Input.InputIdx != kb));
+
+            KeyboardKey nextJoinKey = JoinGame.KeyboardKeys[nextEmptyKbSlot];
+            int keyWidth = InputGraphics.CalculateKeyWidth(nextJoinKey, keyFormat);
+
+            TextUtils.DrawTextAligned("Join", 10, new Vector2(centerX, centerY + 10), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Outline);
+
+            InputGraphics.GamepadFaceOptions JoinButton = new InputGraphics.GamepadFaceOptions
+            {
+                Base = globalOptions with { Height = 10 },
+                Directions = InputGraphics.AxisDirections.DOWN
+            };
+
+            if (InputManager.GetKeyboardPlayerCount() < InputManager.MAX_KEYBOARD_PLAYERS)
+            {
+                InputGraphics.DrawKeyboardKey(new Vector2(centerX - keyWidth / 2 - 10, centerY + 30), nextJoinKey, out int Keywidth, keyFormat);
+                InputGraphics.DrawFaceButtons(new Vector2(centerX + 15, centerY + 30), JoinButton);
+            }
+            else
+            {
+                InputGraphics.DrawFaceButtons(new Vector2(centerX, centerY + 30), JoinButton);
+            }
+
+#endif
 
             // Draw Player Info if player exists
             PlayerSlot player = InputManager.Players[i];
