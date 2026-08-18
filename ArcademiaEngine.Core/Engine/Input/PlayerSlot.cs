@@ -11,6 +11,7 @@ public struct PlayerSlot
     {
         PlayerIndex = playerIndex;
         IsActive = false;
+        Input = new();
     }
 
     public readonly string GetFriendlyName()
