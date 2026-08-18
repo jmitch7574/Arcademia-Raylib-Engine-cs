@@ -1,5 +1,6 @@
 using System.Data;
 using System.Numerics;
+using ArcademiaEngine.Core;
 using Raylib_cs;
 
 public class PlayerInput
@@ -45,9 +46,8 @@ public class PlayerInput
         ButtonAction action = ActionMap.GetButtonAction(actionName);
         if (action == null) return false;
 
-#if ARCADEMIA
-        return keyCheck((KeyboardKey)action.ArcademiaButtons[InputIdx]);
-#endif
+        if (Launcher.IsArcademia())
+            return keyCheck((KeyboardKey)action.ArcademiaButtons[InputIdx]);
 
         if (IsKeyboard) return keyCheck(action.KeyboardKeys[InputIdx]);
 
@@ -65,10 +65,9 @@ public class PlayerInput
 
     private float GetAxisValue(AxisAction action)
     {
-#if ARCADEMIA
-        return Raylib.IsKeyDown((KeyboardKey)action.PositiveAction.ArcademiaButtons[InputIdx]) -
-               Raylib.IsKeyDown((KeyboardKey)action.NegativeAction.ArcademiaButtons[InputIdx]);
-#endif
+        if (Launcher.IsArcademia())
+            return Raylib.IsKeyDown((KeyboardKey)action.PositiveAction.ArcademiaButtons[InputIdx]) -
+                   Raylib.IsKeyDown((KeyboardKey)action.NegativeAction.ArcademiaButtons[InputIdx]);
 
         if (IsKeyboard) return Raylib.IsKeyDown(action.PositiveAction.KeyboardKeys[InputIdx]) -
                                Raylib.IsKeyDown(action.NegativeAction.KeyboardKeys[InputIdx]);

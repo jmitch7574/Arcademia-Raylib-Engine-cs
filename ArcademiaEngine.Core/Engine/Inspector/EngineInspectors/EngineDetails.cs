@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using ArcademiaEngine.Core;
 using ImGuiNET;
 using Raylib_cs;
 
@@ -18,5 +19,7 @@ public sealed class EngineDetails : InspectorTab
         ImGui.Text($"Raylib v{Raylib.RAYLIB_VERSION}");
         ImGui.Text($"DearImGui v{ImGui.GetVersion()}");
 
+        ImGui.SeparatorText("Engine Details");
+        ImGui.Text($"Arcademia Mode: {Launcher.IsArcademia()}");
     }
 }

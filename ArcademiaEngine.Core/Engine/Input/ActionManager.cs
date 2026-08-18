@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ArcademiaEngine.Core;
 using Raylib_cs;
 
 public class ButtonAction
@@ -88,11 +89,12 @@ public class ActionMap
         bool controllerPress = activeControllerSlots
             .Any(s => gamepadCheck(s, action.GamepadButton));
 
-#if ARCADEMIA
-        return action.ArcademiaButtons.
-            Where((key, index) => includeNonPlayers || activeKeyboardSlots.Contains(index))
-            .Any(key => keyCheck((KeyboardKey)key));
-#endif
+        if (Launcher.IsArcademia())
+        {
+            return action.ArcademiaButtons.
+                Where((key, index) => includeNonPlayers || activeKeyboardSlots.Contains(index))
+                .Any(key => keyCheck((KeyboardKey)key));
+        }
 
         return keyboardPress || controllerPress;
     }
@@ -115,45 +117,49 @@ public class ActionMap
         float negValue = 0f;
         float axisValue = 0f;
 
-#if ARCADEMIA
-        for (int i = 0; i < action.PositiveAction.ArcademiaButtons.Count; i++)
+        if (Launcher.IsArcademia())
         {
-            if (Raylib.IsKeyDown((KeyboardKey)action.PositiveAction.ArcademiaButtons[i])) 
-                posValue++;
-        }
-
-        for (int i = 0; i < action.NegativeAction.ArcademiaButtons.Count; i++)
-        {
-            if (Raylib.IsKeyDown((KeyboardKey)action.NegativeAction.ArcademiaButtons[i])) 
-                negValue++;
-        }
-#else
-        for (int i = 0; i < action.PositiveAction.KeyboardKeys.Count; i++)
-        {
-            if (Raylib.IsKeyDown(action.PositiveAction.KeyboardKeys[i]))
-                posValue++;
-        }
-
-        for (int i = 0; i < action.NegativeAction.KeyboardKeys.Count; i++)
-        {
-            if (Raylib.IsKeyDown(action.NegativeAction.KeyboardKeys[i]))
-                negValue++;
-        }
-
-        for (int i = 0; i < InputManager.MAX_CONTROLLER_LISTENING; i++)
-        {
-            float axis = Raylib.GetGamepadAxisMovement(i, action.ControllerAxis);
-            if (float.Abs(axis) > float.Abs(axisValue))
+            for (int i = 0; i < action.PositiveAction.ArcademiaButtons.Count; i++)
             {
-                axisValue = axis;
+                if (Raylib.IsKeyDown((KeyboardKey)action.PositiveAction.ArcademiaButtons[i]))
+                    posValue++;
+            }
+
+            for (int i = 0; i < action.NegativeAction.ArcademiaButtons.Count; i++)
+            {
+                if (Raylib.IsKeyDown((KeyboardKey)action.NegativeAction.ArcademiaButtons[i]))
+                    negValue++;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < action.PositiveAction.KeyboardKeys.Count; i++)
+            {
+                if (Raylib.IsKeyDown(action.PositiveAction.KeyboardKeys[i]))
+                    posValue++;
+            }
+
+            for (int i = 0; i < action.NegativeAction.KeyboardKeys.Count; i++)
+            {
+                if (Raylib.IsKeyDown(action.NegativeAction.KeyboardKeys[i]))
+                    negValue++;
+            }
+
+            for (int i = 0; i < InputManager.MAX_CONTROLLER_LISTENING; i++)
+            {
+                float axis = Raylib.GetGamepadAxisMovement(i, action.ControllerAxis);
+                if (float.Abs(axis) > float.Abs(axisValue))
+                {
+                    axisValue = axis;
+                }
+            }
+
+            if (float.Abs(axisValue) < 0.1f)
+            {
+                axisValue = 0f;
             }
         }
 
-        if (float.Abs(axisValue) < 0.1f)
-        {
-            axisValue = 0f;
-        }
-#endif
         return Math.Clamp(posValue - negValue + axisValue, -1.0f, 1.0f);
     }
 

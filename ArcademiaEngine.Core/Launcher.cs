@@ -6,6 +6,7 @@ public struct LauncherConfig
 {
     public bool EnableImGui;
     public bool IsWeb;
+    public bool IsArcademia;
     public string Title;
 }
 
@@ -84,4 +85,6 @@ public static class Launcher
 
         Raylib.EndDrawing();
     }
+
+    public static bool IsArcademia() => config.IsArcademia;
 }

@@ -1,3 +1,4 @@
+using ArcademiaEngine.Core;
 using Raylib_cs;
 
 public class InputManager
@@ -56,36 +57,39 @@ public class InputManager
 
     private static void CheckPlayerJoins()
     {
-#if ARCADEMIA
-                if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P1_A))
+        if (Launcher.IsArcademia())
+        {
+            if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P1_A))
+            {
+                if (Players[0].IsActive)
                 {
-                    if (Players[0].IsActive)
-                    {
-                        Players[0].Input.TimeSinceIdentifyingInput = 0;
-                    }
-                    else if (IsListening)
-                    {
-                        Players[0].IsActive = true;
-                        Players[0].Input = new(true, 0);
-                        PlayerJoined?.Invoke(0);
-                    }
+                    Players[0].Input.TimeSinceIdentifyingInput = 0;
                 }
-
-                if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P2_A))
+                else if (IsListening)
                 {
-                    if (Players[1].IsActive)
-                    {
-                        Players[1].Input.TimeSinceIdentifyingInput = 0;
-                    }
-                    else if (IsListening)
-                    {
-                        Players[1].IsActive = true;
-                        Players[1].Input = new(true, 1);
-                        PlayerJoined?.Invoke(1);
-                    }
+                    Players[0].IsActive = true;
+                    Players[0].Input = new(true, 0);
+                    PlayerJoined?.Invoke(0);
                 }
+            }
 
-#else
+            if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P2_A))
+            {
+                if (Players[1].IsActive)
+                {
+                    Players[1].Input.TimeSinceIdentifyingInput = 0;
+                }
+                else if (IsListening)
+                {
+                    Players[1].IsActive = true;
+                    Players[1].Input = new(true, 1);
+                    PlayerJoined?.Invoke(1);
+                }
+            }
+
+            return;
+        }
+
         ButtonAction JoinGame = ActionMap.GetButtonAction("JoinGame");
 
         // New Keyboard Player
@@ -181,8 +185,6 @@ public class InputManager
                 }
             }
         }
-
-#endif
     }
 
     private static void CheckPlayerDrops()

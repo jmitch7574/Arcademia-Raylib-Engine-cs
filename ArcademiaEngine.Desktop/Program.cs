@@ -10,9 +10,14 @@ namespace DesktopApp
         public static void Main(string[] args)
         {
             bool useImGui = false;
+            bool isArcademia = false;
 
 #if DEBUG
             useImGui = true;
+#endif
+
+#if ARCADEMIA
+            isArcademia = true;
 #endif
 
             const int width = 1920;
@@ -27,7 +32,7 @@ namespace DesktopApp
             Raylib.SetTargetFPS(60);
 
             // Initialize our shared game core
-            Launcher.Init(new LauncherConfig { EnableImGui = useImGui, IsWeb = false });
+            Launcher.Init(new LauncherConfig { EnableImGui = useImGui, IsWeb = false, IsArcademia = isArcademia });
 
             // Native blocking loop: tightly runs execution cycles
             while (!Raylib.WindowShouldClose())

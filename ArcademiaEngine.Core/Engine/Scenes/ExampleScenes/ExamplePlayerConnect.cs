@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Xml;
+using ArcademiaEngine.Core;
 using ArcademiaEngine.Core.Utils;
 using Raylib_cs;
 
@@ -104,30 +105,32 @@ public class ExamplePlayerConnect : Scene
         }
         else
         {
-#if ARCADEMIA
-            TextUtils.DrawTextAligned($"Press Start to Begin", 30, new Vector2(320, 330),
-                TextUtils.GuiTextAlignment.Center,
-                TextUtils.GuiTextAlignmentVertical.Middle,
-                TextColor);
-#else
-            int keyWidth = InputGraphics.CalculateKeyWidth(KeyboardKey.Enter, keyFormat);
-
-            InputGraphics.DrawKeyboardKey(new Vector2(320 - keyWidth, 305), KeyboardKey.Enter, out int width, keyFormat);
-
-            InputGraphics.DrawMenuButton(new Vector2(320 + 30, 305), new InputGraphics.GamepadMenuOptions
+            if (Launcher.IsArcademia())
             {
-                Base = globalOptions with { Height = 15 },
-                Button = GamepadButton.MiddleRight
-            });
+                TextUtils.DrawTextAligned($"Press Start to Begin", 30, new Vector2(320, 330),
+                    TextUtils.GuiTextAlignment.Center,
+                    TextUtils.GuiTextAlignmentVertical.Middle,
+                    TextColor);
+            }
+            else
+            {
+                int keyWidth = InputGraphics.CalculateKeyWidth(KeyboardKey.Enter, keyFormat);
 
-            TextUtils.DrawTextAligned("/", 20, new Vector2(320, 305), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, TextColor);
+                InputGraphics.DrawKeyboardKey(new Vector2(320 - keyWidth, 305), KeyboardKey.Enter, out int width, keyFormat);
 
-            TextUtils.DrawTextAligned($"Press to Begin", 30, new Vector2(320, 330),
-                TextUtils.GuiTextAlignment.Center,
-                TextUtils.GuiTextAlignmentVertical.Middle,
-                TextColor);
-#endif
+                InputGraphics.DrawMenuButton(new Vector2(320 + 30, 305), new InputGraphics.GamepadMenuOptions
+                {
+                    Base = globalOptions with { Height = 15 },
+                    Button = GamepadButton.MiddleRight
+                });
 
+                TextUtils.DrawTextAligned("/", 20, new Vector2(320, 305), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, TextColor);
+
+                TextUtils.DrawTextAligned($"Press to Begin", 30, new Vector2(320, 330),
+                    TextUtils.GuiTextAlignment.Center,
+                    TextUtils.GuiTextAlignmentVertical.Middle,
+                    TextColor);
+            }
         }
 
         if (Config.MaxPlayers < 4)
@@ -177,42 +180,44 @@ public class ExamplePlayerConnect : Scene
                             TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle,
                             Outline);
 
-#if ARCADEMIA
-            InputGraphics.DrawArcademiaButton(new Vector2(centerX - 25, centerY + 10), new InputGraphics.ArcademiaButtonOptions
+            if (Launcher.IsArcademia())
             {
-                Base = globalOptions with { Height = 15 },
-                Button = ArcademiaKeybind.P1_A
-            });
-            TextUtils.DrawTextAligned("Join", 20, new Vector2(centerX - 10, centerY + 10), TextUtils.GuiTextAlignment.Left, TextUtils.GuiTextAlignmentVertical.Middle, Outline);
-#else
-            ButtonAction JoinGame = ActionMap.GetButtonAction("JoinGame");
-
-            int nextEmptyKbSlot = Enumerable.Range(0, InputManager.MAX_KEYBOARD_PLAYERS)
-                .FirstOrDefault(kb => InputManager.Players.All(p =>
-                    !p.IsActive || !p.Input.IsKeyboard || p.Input.InputIdx != kb));
-
-            KeyboardKey nextJoinKey = JoinGame.KeyboardKeys[nextEmptyKbSlot];
-            int keyWidth = InputGraphics.CalculateKeyWidth(nextJoinKey, keyFormat);
-
-            TextUtils.DrawTextAligned("Join", 10, new Vector2(centerX, centerY + 10), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Outline);
-
-            InputGraphics.GamepadFaceOptions JoinButton = new InputGraphics.GamepadFaceOptions
-            {
-                Base = globalOptions with { Height = 10 },
-                Directions = InputGraphics.AxisDirections.DOWN
-            };
-
-            if (InputManager.GetKeyboardPlayerCount() < InputManager.MAX_KEYBOARD_PLAYERS)
-            {
-                InputGraphics.DrawKeyboardKey(new Vector2(centerX - keyWidth / 2 - 10, centerY + 30), nextJoinKey, out int Keywidth, keyFormat);
-                InputGraphics.DrawFaceButtons(new Vector2(centerX + 15, centerY + 30), JoinButton);
+                InputGraphics.DrawArcademiaButton(new Vector2(centerX - 25, centerY + 10), new InputGraphics.ArcademiaButtonOptions
+                {
+                    Base = globalOptions with { Height = 15 },
+                    Button = ArcademiaKeybind.P1_A
+                });
+                TextUtils.DrawTextAligned("Join", 20, new Vector2(centerX - 10, centerY + 10), TextUtils.GuiTextAlignment.Left, TextUtils.GuiTextAlignmentVertical.Middle, Outline);
             }
             else
             {
-                InputGraphics.DrawFaceButtons(new Vector2(centerX, centerY + 30), JoinButton);
-            }
+                ButtonAction JoinGame = ActionMap.GetButtonAction("JoinGame");
 
-#endif
+                int nextEmptyKbSlot = Enumerable.Range(0, InputManager.MAX_KEYBOARD_PLAYERS)
+                    .FirstOrDefault(kb => InputManager.Players.All(p =>
+                        !p.IsActive || !p.Input.IsKeyboard || p.Input.InputIdx != kb));
+
+                KeyboardKey nextJoinKey = JoinGame.KeyboardKeys[nextEmptyKbSlot];
+                int keyWidth = InputGraphics.CalculateKeyWidth(nextJoinKey, keyFormat);
+
+                TextUtils.DrawTextAligned("Join", 10, new Vector2(centerX, centerY + 10), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Outline);
+
+                InputGraphics.GamepadFaceOptions JoinButton = new InputGraphics.GamepadFaceOptions
+                {
+                    Base = globalOptions with { Height = 10 },
+                    Directions = InputGraphics.AxisDirections.DOWN
+                };
+
+                if (InputManager.GetKeyboardPlayerCount() < InputManager.MAX_KEYBOARD_PLAYERS)
+                {
+                    InputGraphics.DrawKeyboardKey(new Vector2(centerX - keyWidth / 2 - 10, centerY + 30), nextJoinKey, out int Keywidth, keyFormat);
+                    InputGraphics.DrawFaceButtons(new Vector2(centerX + 15, centerY + 30), JoinButton);
+                }
+                else
+                {
+                    InputGraphics.DrawFaceButtons(new Vector2(centerX, centerY + 30), JoinButton);
+                }
+            }
 
             // Draw Player Info if player exists
             PlayerSlot player = InputManager.Players[i];
@@ -228,9 +233,8 @@ public class ExamplePlayerConnect : Scene
 
                 Texture2D targetTexture = player.Input.IsKeyboard ? KeyboardMicro : ControllerMicro;
 
-#if ARCADEMIA
-                targetTexture = ArcadeMicro;
-#endif
+                if (Launcher.IsArcademia())
+                    targetTexture = ArcadeMicro;
 
                 float scale = 1.5f - float.Clamp(player.Input.TimeSinceIdentifyingInput * 2.0f,
                                       0.0f, 0.5f);
