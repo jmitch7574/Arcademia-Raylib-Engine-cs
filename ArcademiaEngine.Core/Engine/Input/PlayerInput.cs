@@ -1,3 +1,4 @@
+using System.Data;
 using System.Numerics;
 using Raylib_cs;
 
@@ -39,41 +40,28 @@ public class PlayerInput
         Lifetime = lifetime;
     }
 
-    public bool IsActionPressed(string actionName)
+    private bool CheckAction(string actionName, Func<KeyboardKey, bool> keyCheck, Func<int, GamepadButton, bool> gamepadCheck)
     {
         ButtonAction action = ActionMap.GetButtonAction(actionName);
+        if (action == null) return false;
+
 #if ARCADEMIA
-        return Raylib.IsKeyPressed((KeyboardKey)action.ArcademiaButtons[InputIdx]);
+        return keyCheck((KeyboardKey)action.ArcademiaButtons[InputIdx]);
 #endif
 
-        if (IsKeyboard) return Raylib.IsKeyPressed(action.KeyboardKeys[InputIdx]);
+        if (IsKeyboard) return keyCheck(action.KeyboardKeys[InputIdx]);
 
-        return Raylib.IsGamepadButtonPressed(InputIdx, action.GamepadButton);
+        return gamepadCheck(InputIdx, action.GamepadButton);
     }
+
+    public bool IsActionPressed(string actionName)
+        => CheckAction(actionName, k => Raylib.IsKeyPressed(k), (idx, b) => Raylib.IsGamepadButtonPressed(idx, b));
 
     public bool IsActionDown(string actionName)
-    {
-        ButtonAction action = ActionMap.GetButtonAction(actionName);
-#if ARCADEMIA
-        return Raylib.IsKeyDown((KeyboardKey)action.ArcademiaButtons[InputIdx]);
-#endif
-
-        if (IsKeyboard) return Raylib.IsKeyDown(action.KeyboardKeys[InputIdx]);
-
-        return Raylib.IsGamepadButtonDown(InputIdx, action.GamepadButton);
-    }
+        => CheckAction(actionName, k => Raylib.IsKeyDown(k), (idx, b) => Raylib.IsGamepadButtonDown(idx, b));
 
     public bool IsActionReleased(string actionName)
-    {
-        ButtonAction action = ActionMap.GetButtonAction(actionName);
-#if ARCADEMIA
-        return Raylib.IsKeyReleased((KeyboardKey)action.ArcademiaButtons[InputIdx]);
-#endif
-
-        if (IsKeyboard) return Raylib.IsKeyReleased(action.KeyboardKeys[InputIdx]);
-
-        return Raylib.IsGamepadButtonReleased(InputIdx, action.GamepadButton);
-    }
+        => CheckAction(actionName, k => Raylib.IsKeyReleased(k), (idx, b) => Raylib.IsGamepadButtonReleased(idx, b));
 
     private float GetAxisValue(AxisAction action)
     {
@@ -98,6 +86,7 @@ public class PlayerInput
     public float GetActionAxis(string actionName)
     {
         AxisAction action = ActionMap.GetAxisAction(actionName);
+        if (action == null) return 0;
 
         return GetAxisValue(action);
     }
@@ -105,6 +94,8 @@ public class PlayerInput
     public Vector2 GetActionVector2(string actionName)
     {
         VectorAction action = ActionMap.GetVectorAction(actionName);
+        if (action == null) return new(0, 0);
+
         return new Vector2(GetAxisValue(action.AxisX), GetAxisValue(action.AxisY));
     }
 }
