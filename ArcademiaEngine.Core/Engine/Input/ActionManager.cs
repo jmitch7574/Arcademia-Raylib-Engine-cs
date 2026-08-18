@@ -78,8 +78,8 @@ public class ActionMap
         ButtonAction action = ActionMap.GetButtonAction(actionName);
         if (action == null) return false;
 
-        var activeKeyboardSlots = InputManager.Players.Where(p => p.Input != null && p.Input.IsKeyboard).Select(p => p.Input.InputIdx).ToHashSet();
-        var activeControllerSlots = InputManager.Players.Where(p => p.Input != null && !p.Input.IsKeyboard).Select(p => p.Input.InputIdx).ToHashSet();
+        var activeKeyboardSlots = InputManager.Players.Where(p => p.Input != null && p.IsActive && p.Input.IsKeyboard).Select(p => p.Input.InputIdx).ToHashSet();
+        var activeControllerSlots = InputManager.Players.Where(p => p.Input != null && p.IsActive && !p.Input.IsKeyboard).Select(p => p.Input.InputIdx).ToHashSet();
 
         bool keyboardPress = action.KeyboardKeys
             .Where((key, index) => includeNonPlayers || activeKeyboardSlots.Contains(index))
