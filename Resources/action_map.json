@@ -6,10 +6,10 @@
         "Two"
       ],
       "ArcademiaButtons": [
-        "P1_START",
-        "P2_START"
+        "P1_A",
+        "P2_A"
       ],
-      "GamepadButton": "MiddleRight"
+      "GamepadButton": "RightFaceDown"
     },
     "DropOut": {
       "KeyboardKeys": [
@@ -21,6 +21,17 @@
         "P2_EXIT"
       ],
       "GamepadButton": "MiddleLeft"
+    },
+    "StartGame": {
+      "KeyboardKeys": [
+        "Enter",
+        "Enter"
+      ],
+      "ArcademiaButtons": [
+        "P1_START",
+        "P2_START"
+      ],
+      "GamepadButton": "MiddleRight"
     }
   },
   "AxisActions": {},

@@ -57,7 +57,7 @@ public class InputManager
     private static void CheckPlayerJoins()
     {
 #if ARCADEMIA
-                if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P1_START))
+                if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P1_A))
                 {
                     if (Players[0].IsActive)
                     {
@@ -71,7 +71,7 @@ public class InputManager
                     }
                 }
 
-                if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P2_START))
+                if (Raylib.IsKeyPressed((KeyboardKey)ArcademiaKeybind.P2_A))
                 {
                     if (Players[1].IsActive)
                     {
