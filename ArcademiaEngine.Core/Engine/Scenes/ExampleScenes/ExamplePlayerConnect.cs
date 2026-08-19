@@ -223,13 +223,15 @@ public class ExamplePlayerConnect : Scene
             PlayerSlot player = InputManager.Players[i];
             if (player.IsActive)
             {
-                float animHeight = Easings.OutSine(float.Clamp(player.Input.Lifetime, 0, 1)) * height;
+                float animHeight = Easings.OutQuint(float.Clamp(player.Input.Lifetime / 2, 0, 1)) * height;
+                float animWidth = Easings.OutQuint(float.Clamp(player.Input.Lifetime / 2, 0, 1)) * width;
 
-                Raylib.BeginScissorMode((int)x, (int)y, (int)width, (int)animHeight);
+                float startY = y + ((height / 2) - (animHeight / 2));
+                float startX = x + ((width / 2) - (animWidth / 2));
+
+                Raylib.BeginScissorMode((int)startX, (int)startY, (int)animWidth, (int)animHeight);
 
                 Raylib.DrawRectangleRec(new Rectangle(x, y, width, height), Raylib.ColorBrightness(player.GetColour(), 0.5f));
-
-                TextUtils.DrawTextAligned($"P{i + 1}", 20, new Vector2(centerX, y + 30), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Raylib.ColorBrightness(player.GetColour(), 0.8f));
 
                 Texture2D targetTexture = player.Input.IsKeyboard ? KeyboardMicro : ControllerMicro;
 
@@ -240,9 +242,11 @@ public class ExamplePlayerConnect : Scene
                                       0.0f, 0.5f);
 
                 Vector2 position =
-                    new(centerX - (32 * scale), centerY - (16 * scale) + 16);
+                    new(centerX - (32 * scale), centerY + 16 - (16 * scale));
 
                 Raylib.DrawTextureEx(targetTexture, position, 0, scale, Raylib.ColorAlpha(Color.White, 0.4f));
+
+                TextUtils.DrawTextAligned($"P{i + 1}", 40, new Vector2(centerX, centerY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Bottom, Raylib.ColorBrightness(player.GetColour(), 0.8f));
 
                 Raylib.EndScissorMode();
             }
