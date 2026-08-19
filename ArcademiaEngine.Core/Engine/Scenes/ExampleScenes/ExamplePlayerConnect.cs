@@ -87,12 +87,19 @@ public class ExamplePlayerConnect : Scene
             VerticalAlignment = TextUtils.GuiTextAlignment.Middle
         };
 
+        TextUtils.WaveSettings waveSettings = new()
+        {
+            Amplitude = 5,
+            Frequency = 0.5f,
+            Speed = 2
+        };
+
         vp.Begin();
 
         Raylib.ClearBackground(Background);
 
         // Top Text
-        TextUtils.DrawTextAligned("Who's Playing...", new Vector2(320, 25), textSettings);
+        TextUtils.DrawTextAligned("Who's Playing...", new Vector2(320, 25), textSettings, waveSettings);
 
         // Bottom Text
 
@@ -104,13 +111,13 @@ public class ExamplePlayerConnect : Scene
 
         if (InputManager.GetPlayerCount() < Config.MinPlayers)
         {
-            TextUtils.DrawTextAligned($"Minimum {Config.MinPlayers} Required", new Vector2(320, 330), textSettings);
+            TextUtils.DrawTextAligned($"Minimum {Config.MinPlayers} Required", new Vector2(320, 330), textSettings, waveSettings);
         }
         else
         {
             if (Launcher.IsArcademia())
             {
-                TextUtils.DrawTextAligned($"Press Start to Begin", new Vector2(320, 330), textSettings);
+                TextUtils.DrawTextAligned($"Press Start to Begin", new Vector2(320, 330), textSettings, waveSettings);
             }
             else
             {
@@ -126,7 +133,7 @@ public class ExamplePlayerConnect : Scene
 
                 TextUtils.DrawTextAligned("/", new Vector2(320, 305), textSettings with { FontSize = 20 });
 
-                TextUtils.DrawTextAligned($"Press to Begin", new Vector2(320, 330), textSettings with { FontSize = 30 });
+                TextUtils.DrawTextAligned($"Press to Begin", new Vector2(320, 330), textSettings with { FontSize = 30 }, waveSettings);
             }
         }
 
