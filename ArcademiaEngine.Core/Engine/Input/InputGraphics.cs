@@ -17,6 +17,13 @@ public static class InputGraphics
     static Texture2D KeyTex;
     static NPatchInfo KeyInfo;
     static Shader KeyShader;
+    static TextUtils.TextSettings textSettings = new()
+    {
+        FontSize = 0,
+        Color = Color.White,
+        HorizontalAlignment = TextUtils.GuiTextAlignment.Middle,
+        VerticalAlignment = TextUtils.GuiTextAlignment.Middle
+    };
 
     public struct GlobalOptions
     {
@@ -174,7 +181,7 @@ public static class InputGraphics
         Raylib.DrawTextureNPatch(KeyTex, KeyInfo, new Rectangle(topLeftX, topLeftY - additionalHeight / 2, width, boxHeight), new Vector2(0, 0), 0, Color.White);
         Raylib.EndShaderMode();
 
-        TextUtils.DrawTextAligned(text, fontSize, new Vector2(center.X, center.Y), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
+        TextUtils.DrawTextAligned(text, new Vector2(center.X, center.Y), textSettings with { FontSize = fontSize, Color = options.Base.IconColor });
     }
 
     public static string GetKeyDisplayName(KeyboardKey key) => key switch
@@ -407,7 +414,7 @@ public static class InputGraphics
         int triangleHalfWidth = (int)(options.Base.Height / 3f);       // Distance from center to outer edge
         int edgeDist = (int)(options.Base.Height * 1.25f);       // Distance from center to outer edge
 
-        int textHeight = ((int)(options.Base.Height / 10) * 10);
+        int fontSize = ((int)(options.Base.Height / 10) * 10);
 
         if (!options.StickPress)
         {
@@ -434,7 +441,7 @@ public static class InputGraphics
         Raylib.DrawRing(new Vector2(cX + mX, cY + mY), stickOutlineStart, stickOutlineEnd, 0, 360, 8, options.Base.OutlineColor);
 
         // Stick Label
-        TextUtils.DrawTextAligned($"{options.StickLabel}", textHeight, new Vector2(cX + mX, cY + mY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
+        TextUtils.DrawTextAligned($"{options.StickLabel}", new Vector2(cX + mX, cY + mY), textSettings with { FontSize = fontSize, Color = options.Base.IconColor });
 
         if (options.StickPress)
         {
@@ -448,7 +455,7 @@ public static class InputGraphics
         int cX = (int)center.X;
         int cY = (int)center.Y;
 
-        int textHeight = ((int)(options.Base.Height / 10) * 10);
+        int fontSize = ((int)(options.Base.Height / 10) * 10);
 
         int height = (int)(options.Base.Height);
         int width = (int)(height * 2f);
@@ -470,7 +477,7 @@ public static class InputGraphics
 
         Raylib.DrawRectangleLines(topLeftX, topLeftY, width, height, options.Base.OutlineColor);
 
-        TextUtils.DrawTextAligned(shoulderButtonText, textHeight, new Vector2(cX, cY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
+        TextUtils.DrawTextAligned(shoulderButtonText, new Vector2(cX, cY), textSettings with { FontSize = fontSize, Color = options.Base.IconColor });
     }
 
 
@@ -479,15 +486,15 @@ public static class InputGraphics
         int cX = (int)center.X;
         int cY = (int)center.Y;
 
-        int textHeight = ((int)(options.Base.Height / 10) * 10);
+        int fontSize = ((int)(options.Base.Height / 10) * 10);
 
         string triggerText = "??";
 
         if (options.Button == GamepadButton.LeftTrigger2 || options.Axis == GamepadAxis.LeftTrigger) triggerText = "L2";
         if (options.Button == GamepadButton.RightTrigger2 || options.Axis == GamepadAxis.RightTrigger) triggerText = "R2";
 
-        int height = (int)(textHeight * 2.5f);
-        int width = (int)(textHeight * 1.5f);
+        int height = (int)(fontSize * 2.5f);
+        int width = (int)(fontSize * 1.5f);
 
         int topLeftX = cX - width / 2;
         int topLeftY = cY - height / 2;
@@ -509,7 +516,7 @@ public static class InputGraphics
 
         Raylib.DrawRectangleLines(topLeftX, topLeftY, width, height, options.Base.OutlineColor);
 
-        TextUtils.DrawTextAligned(triggerText, textHeight, new Vector2(cX, cY), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
+        TextUtils.DrawTextAligned(triggerText, new Vector2(cX, cY), textSettings with { FontSize = fontSize, Color = options.Base.IconColor });
     }
 
 
@@ -618,7 +625,7 @@ public static class InputGraphics
 
         int offset = options.Base.Height / 4;
 
-        int textHeight = ((int)(options.Base.Height / 10) * 10);
+        int fontSize = ((int)(options.Base.Height / 10) * 10);
 
         Raylib.DrawCircle(cX, cY + offset / 2, options.Base.Height / 2, Raylib.ColorBrightness(options.Base.FillColor, -0.25f));
         Raylib.DrawCircleLines(cX, cY + offset / 2, options.Base.Height / 2, Raylib.ColorBrightness(options.Base.OutlineColor, -0.25f));
@@ -639,7 +646,7 @@ public static class InputGraphics
             _ => (true, "?")
         };
 
-        if (stringInfo.isCenter) TextUtils.DrawTextAligned(stringInfo.message, textHeight, new Vector2(cX, cY - offset / 2), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
-        else TextUtils.DrawTextAligned(stringInfo.message, textHeight, new Vector2(cX, cY + options.Base.Height), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, options.Base.IconColor);
+        if (stringInfo.isCenter) TextUtils.DrawTextAligned(stringInfo.message, new Vector2(cX, cY - offset / 2), textSettings with { FontSize = fontSize, Color = options.Base.IconColor });
+        else TextUtils.DrawTextAligned(stringInfo.message, new Vector2(cX, cY + options.Base.Height), textSettings with { FontSize = fontSize, Color = options.Base.IconColor });
     }
 }

@@ -74,18 +74,26 @@ public class ControllerTest : Scene
         vp.Begin();
         Raylib.ClearBackground(Color.Black);
 
-        TextUtils.DrawTextAligned($"Gamepad {controllerId}", 10, new Vector2(cX, 10), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Color.White);
+        TextUtils.TextSettings textSettings = new()
+        {
+            FontSize = 10,
+            Color = Color.White,
+            HorizontalAlignment = TextUtils.GuiTextAlignment.Middle,
+            VerticalAlignment = TextUtils.GuiTextAlignment.Middle
+        };
+
+        TextUtils.DrawTextAligned($"Gamepad {controllerId}", new Vector2(cX, 10), textSettings);
 
         if (!validController)
         {
-            TextUtils.DrawTextAligned("No Controller", 10, new Vector2(cX, 25), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Color.White);
+            TextUtils.DrawTextAligned("No Controller", new Vector2(cX, 25), textSettings);
             Raylib.DrawTexture(controllerTex, 0, 0, Raylib.ColorBrightness(Color.DarkBlue, -0.5f));
             vp.End();
             vp.Draw();
             return;
         }
 
-        TextUtils.DrawTextAligned(Raylib.GetGamepadName_(controllerId), 10, new Vector2(cX, 25), TextUtils.GuiTextAlignment.Center, TextUtils.GuiTextAlignmentVertical.Middle, Color.White);
+        TextUtils.DrawTextAligned(Raylib.GetGamepadName_(controllerId), new Vector2(cX, 25), textSettings);
 
 
         Raylib.DrawTexture(controllerTex, 0, 0, Raylib.ColorBrightness(Color.DarkBlue, -0.25f));
