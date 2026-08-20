@@ -33,6 +33,8 @@ public static class TextUtils
 
     public static void DrawTextAligned(string text, Vector2 position, TextSettings settings, WaveSettings? waveSettings = null)
     {
+        Raylib.SetTextureFilter(settings.Font.Texture, TextureFilter.Point);
+
         float spacing = MathF.Floor(settings.FontSize / 10f);
         string[] lines = text.Split('\n');
 
@@ -85,7 +87,7 @@ public static class TextUtils
                 Raylib.DrawTextEx(
                     settings.Font,
                     singleCharStr,
-                    new Vector2(currentX, letterY),
+                    new Vector2((int)currentX, (int)letterY),
                     settings.FontSize,
                     spacing,
                     settings.Color

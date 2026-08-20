@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text.Json;
 using System.Timers;
 using ImGuiNET;
 using Raylib_cs;
@@ -9,24 +10,33 @@ public class ExampleTextPlayground : Scene, ISceneInspector
 
     bool WaveyText;
 
-    TextUtils.TextSettings textSettings = new TextUtils.TextSettings()
-    {
-        FontSize = 20,
-        Color = Color.White,
-        HorizontalAlignment = TextUtils.GuiTextAlignment.Start,
-        VerticalAlignment = TextUtils.GuiTextAlignment.Middle
-    };
+    Font jersey;
 
-    TextUtils.WaveSettings waveSettings = new TextUtils.WaveSettings()
-    {
-        Amplitude = 5,
-        Frequency = 1,
-        Speed = 5,
-    };
+    TextUtils.TextSettings textSettings;
+
+    TextUtils.WaveSettings waveSettings;
 
     public ExampleTextPlayground() : base("ExampleTextPlayground")
     {
         vp = new Viewport(640, 360);
+
+        jersey = Raylib.LoadFontEx("Resources/fonts/jersey_10.ttf", 80, null, 0);
+
+        textSettings = new TextUtils.TextSettings()
+        {
+            FontSize = 10,
+            Font = jersey,
+            Color = Color.White,
+            HorizontalAlignment = TextUtils.GuiTextAlignment.Start,
+            VerticalAlignment = TextUtils.GuiTextAlignment.Middle
+        };
+
+        waveSettings = new TextUtils.WaveSettings()
+        {
+            Amplitude = 5,
+            Frequency = 1,
+            Speed = 5,
+        };
     }
 
     public override void Draw()
@@ -70,6 +80,11 @@ public class ExampleTextPlayground : Scene, ISceneInspector
 
     public void DrawInspector()
     {
+
+        ImGui.SeparatorText("Text Settings");
+        ImGui.InputInt("Font Size", ref textSettings.FontSize);
+
+        ImGui.SeparatorText("Wavy Settings");
         ImGui.Checkbox("Wavey Text enabled", ref WaveyText);
         ImGui.DragFloat("Amplitude", ref waveSettings.Amplitude, 0.1f);
         ImGui.DragFloat("Frequency", ref waveSettings.Frequency, 0.1f);
