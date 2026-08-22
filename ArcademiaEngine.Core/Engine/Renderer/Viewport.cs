@@ -10,6 +10,14 @@ public class Viewport
 
     protected static Stack<Viewport> activeViewports = [];
 
+    public bool Drawing
+    {
+        get
+        {
+            return Rlgl.GetActiveFramebuffer() == (uint)RenderTexture.Id;
+        }
+    }
+
     public Viewport(int width, int height)
     {
         RenderTexture = Raylib.LoadRenderTexture(width, height);
@@ -20,13 +28,22 @@ public class Viewport
         Raylib.UnloadRenderTexture(RenderTexture);
     }
 
-    public void Begin()
+    public void Begin(bool clear = true)
     {
         activeViewports.Push(this);
         Raylib.BeginTextureMode(RenderTexture);
-        Raylib.ClearBackground(Color.Blank);
+        if (clear) Raylib.ClearBackground(Color.Blank);
 
         Raylib.SetMouseScale(Raylib.GetScreenWidth() / Width, Raylib.GetScreenHeight() / Height);
+    }
+
+
+    public void Clear()
+    {
+        Raylib.BeginTextureMode(RenderTexture);
+        Raylib.ClearBackground(Color.Blank);
+        Raylib.EndTextureMode();
+        Restore();
     }
 
     public void End()
@@ -41,7 +58,8 @@ public class Viewport
 
     public void Draw(Rectangle? rec = null, Color? col = null)
     {
-        rec ??= new Rectangle(0, 0, Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+        Vector2 size = GetCurrentViewportSize();
+        rec ??= new Rectangle(0, 0, size.X, size.Y);
         col ??= Color.White;
 
         Raylib.DrawTexturePro(
@@ -57,7 +75,7 @@ public class Viewport
     public static void Restore()
     {
         if (activeViewports.Count > 0)
-            Raylib.BeginTextureMode(activeViewports.Last().RenderTexture);
+            Raylib.BeginTextureMode(activeViewports.Peek().RenderTexture);
     }
 
     public static Viewport GetCurrentViewport()
@@ -67,6 +85,7 @@ public class Viewport
 
     public static Vector2 GetCurrentViewportSize()
     {
+        if (activeViewports.Count == 0) return new Vector2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
         return new Vector2(activeViewports.Peek().Width, activeViewports.Peek().Height);
     }
 

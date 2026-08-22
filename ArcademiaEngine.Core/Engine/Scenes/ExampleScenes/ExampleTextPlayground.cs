@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 using System.Timers;
+using ArcademiaEngine.Core.Engine.Text;
 using ImGuiNET;
 using Raylib_cs;
 
@@ -12,9 +13,7 @@ public class ExampleTextPlayground : Scene, ISceneInspector
 
     Font jersey;
 
-    TextUtils.TextSettings textSettings;
-
-    TextUtils.WaveSettings waveSettings;
+    TextSettings textSettings;
 
     public ExampleTextPlayground() : base("ExampleTextPlayground")
     {
@@ -22,20 +21,13 @@ public class ExampleTextPlayground : Scene, ISceneInspector
 
         jersey = Raylib.LoadFontEx("Resources/fonts/jersey_10.ttf", 80, null, 0);
 
-        textSettings = new TextUtils.TextSettings()
+        textSettings = new TextSettings()
         {
-            FontSize = 10,
+            FontSize = 20,
             Font = jersey,
             Color = Color.White,
-            HorizontalAlignment = TextUtils.GuiTextAlignment.Start,
-            VerticalAlignment = TextUtils.GuiTextAlignment.Middle
-        };
-
-        waveSettings = new TextUtils.WaveSettings()
-        {
-            Amplitude = 5,
-            Frequency = 1,
-            Speed = 5,
+            HorizontalAlignment = Alignment.Start,
+            VerticalAlignment = Alignment.Middle
         };
     }
 
@@ -43,7 +35,7 @@ public class ExampleTextPlayground : Scene, ISceneInspector
     {
         vp.Begin();
         Raylib.ClearBackground(Color.Black);
-        string message = "This is\nmultiline\ntext";
+        string message = "This\nis\ntext";
 
 
 
@@ -52,8 +44,8 @@ public class ExampleTextPlayground : Scene, ISceneInspector
         Raylib.DrawLine(0, 180, 640, 180, Color.Gray);
 
         // Draw Text 
-        var combinations = Enum.GetValues<TextUtils.GuiTextAlignment>()
-            .SelectMany(c => Enum.GetValues<TextUtils.GuiTextAlignment>(), (vertical, horizontal) => (Horizontal: horizontal, Vertical: vertical));
+        var combinations = Enum.GetValues<Alignment>()
+            .SelectMany(c => Enum.GetValues<Alignment>(), (vertical, horizontal) => (Horizontal: horizontal, Vertical: vertical));
 
         int currentX = 0;
         int currentY = 0;
@@ -62,8 +54,7 @@ public class ExampleTextPlayground : Scene, ISceneInspector
             textSettings.HorizontalAlignment = horizontal;
             textSettings.VerticalAlignment = vertical;
 
-            if (WaveyText) TextUtils.DrawTextAligned(message, new Vector2(currentX, currentY), textSettings, waveSettings);
-            else TextUtils.DrawTextAligned(message, new Vector2(currentX, currentY), textSettings);
+            Text.DrawText(message, new Vector2(currentX, currentY), textSettings);
 
             currentX += 320;
 
@@ -83,12 +74,6 @@ public class ExampleTextPlayground : Scene, ISceneInspector
 
         ImGui.SeparatorText("Text Settings");
         ImGui.InputInt("Font Size", ref textSettings.FontSize);
-
-        ImGui.SeparatorText("Wavy Settings");
-        ImGui.Checkbox("Wavey Text enabled", ref WaveyText);
-        ImGui.DragFloat("Amplitude", ref waveSettings.Amplitude, 0.1f);
-        ImGui.DragFloat("Frequency", ref waveSettings.Frequency, 0.1f);
-        ImGui.DragFloat("Speed", ref waveSettings.Speed, 0.1f);
     }
 
     protected override void Update()

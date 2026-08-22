@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Xml;
 using ArcademiaEngine.Core;
+using ArcademiaEngine.Core.Engine.Text;
 using ArcademiaEngine.Core.Utils;
 using Raylib_cs;
 
@@ -79,19 +80,12 @@ public class ExamplePlayerConnect : Scene
         };
 
         // Declare Text Settings
-        TextUtils.TextSettings textSettings = new()
+        TextSettings textSettings = new()
         {
             FontSize = 30, // Default, overriden by most draws
             Color = TextColor,
-            HorizontalAlignment = TextUtils.GuiTextAlignment.Middle,
-            VerticalAlignment = TextUtils.GuiTextAlignment.Middle
-        };
-
-        TextUtils.WaveSettings waveSettings = new()
-        {
-            Amplitude = 5,
-            Frequency = 0.5f,
-            Speed = 2
+            HorizontalAlignment = Alignment.Middle,
+            VerticalAlignment = Alignment.Middle
         };
 
         vp.Begin();
@@ -99,7 +93,7 @@ public class ExamplePlayerConnect : Scene
         Raylib.ClearBackground(Background);
 
         // Top Text
-        TextUtils.DrawTextAligned("Who's Playing...", new Vector2(320, 25), textSettings, waveSettings);
+        Text.DrawText("Who's Playing...", new Vector2(320, 25), textSettings);
 
         // Bottom Text
 
@@ -111,13 +105,13 @@ public class ExamplePlayerConnect : Scene
 
         if (InputManager.GetPlayerCount() < Config.MinPlayers)
         {
-            TextUtils.DrawTextAligned($"Minimum {Config.MinPlayers} Required", new Vector2(320, 330), textSettings, waveSettings);
+            Text.DrawText($"Minimum {Config.MinPlayers} Required", new Vector2(320, 330), textSettings);
         }
         else
         {
             if (Launcher.IsArcademia())
             {
-                TextUtils.DrawTextAligned($"Press Start to Begin", new Vector2(320, 330), textSettings, waveSettings);
+                Text.DrawText($"Press Start to Begin", new Vector2(320, 330), textSettings);
             }
             else
             {
@@ -131,9 +125,9 @@ public class ExamplePlayerConnect : Scene
                     Button = GamepadButton.MiddleRight
                 });
 
-                TextUtils.DrawTextAligned("/", new Vector2(320, 305), textSettings with { FontSize = 20 });
+                Text.DrawText("/", new Vector2(320, 305), textSettings with { FontSize = 20 });
 
-                TextUtils.DrawTextAligned($"Press to Begin", new Vector2(320, 330), textSettings with { FontSize = 30 }, waveSettings);
+                Text.DrawText($"Press to Begin", new Vector2(320, 330), textSettings with { FontSize = 30 });
             }
         }
 
@@ -180,7 +174,7 @@ public class ExamplePlayerConnect : Scene
 
             Raylib.DrawRectangleRec(new Rectangle(x, y, width, height), Background);
 
-            TextUtils.DrawTextAligned($"{i + 1}", new Vector2(centerX, centerY - 30), textSettings);
+            Text.DrawText($"{i + 1}", new Vector2(centerX, centerY - 30), textSettings);
 
             if (Launcher.IsArcademia())
             {
@@ -189,7 +183,7 @@ public class ExamplePlayerConnect : Scene
                     Base = globalOptions with { Height = 15 },
                     Button = ArcademiaKeybind.P1_A
                 });
-                TextUtils.DrawTextAligned("Join", new Vector2(centerX - 10, centerY + 10), textSettings with { FontSize = 20 });
+                Text.DrawText("Join", new Vector2(centerX - 10, centerY + 10), textSettings with { FontSize = 20 });
             }
             else
             {
@@ -202,7 +196,7 @@ public class ExamplePlayerConnect : Scene
                 KeyboardKey nextJoinKey = JoinGame.KeyboardKeys[nextEmptyKbSlot];
                 int keyWidth = InputGraphics.CalculateKeyWidth(nextJoinKey, keyFormat);
 
-                TextUtils.DrawTextAligned("Join", new Vector2(centerX, centerY + 10), textSettings with { FontSize = 10 });
+                Text.DrawText("Join", new Vector2(centerX, centerY + 10), textSettings with { FontSize = 10 });
 
                 InputGraphics.GamepadFaceOptions JoinButton = new InputGraphics.GamepadFaceOptions
                 {
@@ -248,12 +242,12 @@ public class ExamplePlayerConnect : Scene
 
                 Raylib.DrawTextureEx(targetTexture, position, 0, scale, Raylib.ColorAlpha(Color.White, 0.4f));
 
-                TextUtils.DrawTextAligned($"P{i + 1}", new Vector2(centerX, centerY), new TextUtils.TextSettings()
+                Text.DrawText($"P{i + 1}", new Vector2(centerX, centerY), new TextSettings()
                 {
                     FontSize = 40,
                     Color = Raylib.ColorBrightness(player.GetColour(), 0.8f),
-                    HorizontalAlignment = TextUtils.GuiTextAlignment.Middle,
-                    VerticalAlignment = TextUtils.GuiTextAlignment.End
+                    HorizontalAlignment = Alignment.Middle,
+                    VerticalAlignment = Alignment.End
                 });
 
                 Raylib.EndScissorMode();

@@ -1,4 +1,5 @@
 using System.Numerics;
+using ArcademiaEngine.Core.Engine.Text;
 using Raylib_cs;
 
 public class ControllerTest : Scene
@@ -74,26 +75,26 @@ public class ControllerTest : Scene
         vp.Begin();
         Raylib.ClearBackground(Color.Black);
 
-        TextUtils.TextSettings textSettings = new()
+        TextSettings textSettings = new()
         {
             FontSize = 10,
             Color = Color.White,
-            HorizontalAlignment = TextUtils.GuiTextAlignment.Middle,
-            VerticalAlignment = TextUtils.GuiTextAlignment.Middle
+            HorizontalAlignment = Alignment.Middle,
+            VerticalAlignment = Alignment.Middle
         };
 
-        TextUtils.DrawTextAligned($"Gamepad {controllerId}", new Vector2(cX, 10), textSettings);
+        Text.DrawText($"Gamepad {controllerId}", new Vector2(cX, 10), textSettings);
 
         if (!validController)
         {
-            TextUtils.DrawTextAligned("No Controller", new Vector2(cX, 25), textSettings);
+            Text.DrawText("No Controller", new Vector2(cX, 25), textSettings);
             Raylib.DrawTexture(controllerTex, 0, 0, Raylib.ColorBrightness(Color.DarkBlue, -0.5f));
             vp.End();
             vp.Draw();
             return;
         }
 
-        TextUtils.DrawTextAligned(Raylib.GetGamepadName_(controllerId), new Vector2(cX, 25), textSettings);
+        Text.DrawText(Raylib.GetGamepadName_(controllerId), new Vector2(cX, 25), textSettings);
 
 
         Raylib.DrawTexture(controllerTex, 0, 0, Raylib.ColorBrightness(Color.DarkBlue, -0.25f));
